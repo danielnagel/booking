@@ -83,6 +83,7 @@ function handleSubmit(andContinue) {
       id="application_text"
       v-model="form.application_text"
       label="Bewerbungstext"
+      type="textarea"
     />
     <FormField
       id="venue_street"

@@ -40,6 +40,11 @@ const columns = [
     enableGrouping: false,
     cell: (info) => formatDate(info.getValue()),
   }),
+  columnHelper.accessor('created_by', {
+    header: 'Ersteller',
+    enableGrouping: true,
+    enableSorting: false,
+  }),
   columnHelper.accessor('organizer', { header: 'Veranstalter', enableGrouping: true }),
   columnHelper.accessor('organizer_website', {
     header: 'Website',
@@ -166,7 +171,7 @@ function goToPage(page) {
       v-model="localSearch"
       type="search"
       placeholder="Suche..."
-      class="border border-primary/30 rounded px-3 py-2 max-w-sm"
+      class="bg-secondary text-primary border border-primary rounded px-3 py-2 max-w-sm"
     >
 
     <div class="overflow-x-auto">

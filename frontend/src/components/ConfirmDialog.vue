@@ -11,7 +11,7 @@ defineEmits(['confirm', 'cancel']);
 <template>
   <div
     v-if="open"
-    class="fixed inset-0 bg-primary/50 flex items-center justify-center z-50"
+    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
     @click.self="$emit('cancel')"
   >
     <div class="bg-secondary text-primary rounded-lg p-6 w-full max-w-sm flex flex-col gap-4">
@@ -31,7 +31,7 @@ defineEmits(['confirm', 'cancel']);
         </button>
         <button
           type="button"
-          class="px-4 py-2 rounded bg-red-600 text-secondary"
+          class="px-4 py-2 rounded bg-red-600 text-white"
           @click="$emit('confirm')"
         >
           Löschen

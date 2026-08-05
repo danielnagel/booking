@@ -86,6 +86,7 @@ docker compose exec backend npm run invite:create
 docker compose exec backend npm run invite:list
 docker compose exec backend npm run invite:revoke -- <code>
 docker compose exec backend npm run password-reset:create -- <username>
+docker compose exec backend npm run user:list
 ```
 
 (Voraussetzung: der `backend`-Service läuft, z. B. via
@@ -112,3 +113,8 @@ docker compose exec backend npm run password-reset:create -- <username>
   `POST /api/auth/reset-password` wird der Code gesperrt). Der Code ist
   serverseitig bereits an den Nutzer gebunden, beim Zurücksetzen ist daher nur
   Code + neues Passwort nötig, kein Username.
+
+### Benutzer-Übersicht
+
+- `user:list` – listet alle Nutzer mit Erstellungsdatum und letztem Login auf
+  (`nie`, falls noch kein Login stattgefunden hat).

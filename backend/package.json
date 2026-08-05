@@ -13,6 +13,7 @@
     "invite:list": "node src/cli/inviteList.js",
     "invite:revoke": "node src/cli/inviteRevoke.js",
     "password-reset:create": "node src/cli/passwordResetCreate.js",
+    "user:list": "node src/cli/userList.js",
     "pretest": "node-pg-migrate up",
     "test": "vitest run"
   },

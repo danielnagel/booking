@@ -139,3 +139,28 @@ describe('password-reset:create CLI', () => {
     expect(result.stderr).toMatch(/Verwendung/);
   });
 });
+
+describe('user:list CLI', () => {
+  it('reports when there are no users', async () => {
+    const result = runCli('userList.js');
+
+    expect(result.status).toBe(0);
+    expect(result.stdout).toMatch(/Keine Benutzer/);
+  });
+
+  it('lists users with creation date and last login', async () => {
+    const passwordHash = await bcrypt.hash('irrelevant', 10);
+    await insertUser({
+      username: 'returning-user',
+      passwordHash,
+      lastLoginAt: new Date(),
+    });
+    await insertUser({ username: 'never-logged-in', passwordHash });
+
+    const result = runCli('userList.js');
+
+    expect(result.status).toBe(0);
+    expect(result.stdout).toMatch(/returning-user\s+\(erstellt:.*letzter Login: \d{4}-\d{2}-\d{2}T.*\)/);
+    expect(result.stdout).toMatch(/never-logged-in\s+\(erstellt:.*letzter Login: nie\)/);
+  });
+});

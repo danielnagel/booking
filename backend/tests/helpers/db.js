@@ -29,10 +29,12 @@ export async function insertInviteCode(overrides = {}) {
   return code;
 }
 
-export async function insertUser({ username, passwordHash }) {
+export async function insertUser({ username, passwordHash, createdAt, lastLoginAt }) {
   const { rows } = await pool.query(
-    'INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id, username',
-    [username, passwordHash],
+    `INSERT INTO users (username, password_hash, created_at, last_login_at)
+     VALUES ($1, $2, COALESCE($3, now()), $4)
+     RETURNING id, username, created_at, last_login_at`,
+    [username, passwordHash, createdAt ?? null, lastLoginAt ?? null],
   );
 
   return rows[0];

@@ -111,6 +111,8 @@ router.post('/login', async (req, res) => {
     return res.status(401).json({ error: 'Username oder Passwort falsch.' });
   }
 
+  await pool.query('UPDATE users SET last_login_at = now() WHERE id = $1', [user.id]);
+
   const token = jwt.sign(
     { sub: user.id, username: user.username },
     process.env.JWT_SECRET,

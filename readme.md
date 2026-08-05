@@ -1,5 +1,9 @@
 # Booking
 
+<p align="center">
+  <img src="frontend/public/logo.default.svg" alt="Logo" width="96" height="96">
+</p>
+
 Internes Booking-Tool für die Band: Bandmitglieder tragen hier Bewerbungen für
 Auftritte ein (Veranstalter, Gage, Ort, Bewerbungstext, ...) und behalten in
 einer durchsuch-, sortier- und gruppierbaren Übersicht den Überblick, wer sich

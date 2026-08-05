@@ -83,8 +83,12 @@ Die App ist danach unter `http://localhost` erreichbar (Port über
 
 ## Tests
 
-- Backend: `npm test --workspace=backend` (Vitest + Supertest gegen echtes
-  Postgres, Migrationen laufen automatisch vorher via `pretest`).
+- Backend: `npm test --workspace=backend` (Vitest + Supertest gegen eine
+  **isolierte** Test-Postgres-Instanz, Migrationen laufen automatisch vorher
+  via `pretest`). Vor dem ersten Lauf einmalig
+  `docker compose --profile test up -d db-test` starten – Details und
+  Hintergrund (Sicherung gegen versehentliches Leeren der Dev-DB) in
+  [`backend/README.md`](backend/README.md).
 - Frontend: `npm test --workspace=frontend` (Vitest + Testing Library).
 - E2E: `npm run test:e2e` (Playwright, erwartet einen laufenden Stack z. B.
   über `docker compose up --build -d`).

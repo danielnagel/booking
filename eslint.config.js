@@ -36,6 +36,7 @@ export default [
   },
   {
     files: ['frontend/**/*.js'],
+    ignores: ['frontend/scripts/**'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
@@ -45,9 +46,11 @@ export default [
     },
   },
 
-  // Backend + E2E-Tests (Node.js environment).
+  // Backend + E2E-Tests (Node.js environment). Also covers frontend/scripts:
+  // build-time helpers (e.g. apply-assets.mjs) run under Node, not a
+  // browser, so they need Node globals (process, ...) instead.
   {
-    files: ['backend/**/*.js', 'e2e/**/*.js'],
+    files: ['backend/**/*.js', 'e2e/**/*.js', 'frontend/scripts/**/*.mjs'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',

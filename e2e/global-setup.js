@@ -1,9 +1,8 @@
 // Verifies that the Docker Compose stack (`docker compose up -d` at the repo
 // root) is already running and reachable before any test runs. This suite
-// deliberately does not start/stop the stack itself (see plans/
-// intial-plan-simple-booking-website-for-bands.md, Testing / E2E section) -
-// it only waits a reasonable amount of time for it to become reachable and
-// fails with a clear message if it never does.
+// deliberately does not start/stop the stack itself - it only waits a
+// reasonable amount of time for it to become reachable and fails with a
+// clear message if it never does.
 
 const BASE_URL = process.env.E2E_BASE_URL ?? 'http://localhost';
 const TIMEOUT_MS = 60_000;

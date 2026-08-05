@@ -14,8 +14,8 @@
     "invite:revoke": "node src/cli/inviteRevoke.js",
     "password-reset:create": "node src/cli/passwordResetCreate.js",
     "user:list": "node src/cli/userList.js",
-    "pretest": "node-pg-migrate up",
-    "test": "vitest run"
+    "pretest": "node scripts/run-with-test-db.js node-pg-migrate up",
+    "test": "node scripts/run-with-test-db.js vitest run"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

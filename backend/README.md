@@ -12,6 +12,29 @@ npm run start --workspace=backend  # node src/server.js (ohne Hot-Reload)
 npm test --workspace=backend       # Vitest + Supertest (führt Migrationen vorher via "pretest" aus)
 ```
 
+**Tests brauchen eine eigene, isolierte Datenbank** – `tests/helpers/db.js`
+leert vor jedem Test alle Tabellen (`TRUNCATE ... RESTART IDENTITY CASCADE`).
+Einmal lief das versehentlich gegen die echte lokale Dev-Datenbank statt einer
+Test-DB, weswegen es jetzt zwei Absicherungen gibt:
+
+1. `npm test`/`npm run pretest` laufen über
+   `scripts/run-with-test-db.js`, das `DATABASE_URL` zwingend auf
+   `TEST_DATABASE_URL` (aus `.env`) umbiegt.
+2. `resetDb()` prüft zusätzlich den tatsächlichen Datenbanknamen und bricht
+   mit einem Fehler ab, falls er nicht `"test"` enthält – unabhängig davon,
+   wie `DATABASE_URL` zustande kam.
+
+Vor dem ersten lokalen Testlauf einmalig die isolierte Test-DB starten
+(separater Postgres-Container, eigener Port, kein persistentes Volume – siehe
+`docker-compose.yml`, Service `db-test`):
+
+```bash
+docker compose --profile test up -d db-test
+```
+
+`.env.example` enthält die zugehörigen `TEST_POSTGRES_*`/`TEST_DATABASE_URL`-
+Variablen mit funktionierenden Defaults für Port `5433`.
+
 ## Umgebungsvariablen
 
 Werden aus `.env` gelesen (siehe `.env.example` am Repo-Root; lokal per

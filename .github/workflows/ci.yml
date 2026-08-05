@@ -38,17 +38,24 @@ jobs:
         env:
           POSTGRES_USER: booking
           POSTGRES_PASSWORD: booking
-          POSTGRES_DB: booking
+          # Name must contain "test": backend/tests/helpers/db.js refuses to
+          # truncate tables otherwise (safety net against a misconfigured
+          # DATABASE_URL wiping a real database).
+          POSTGRES_DB: booking_test
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U booking -d booking"
+          --health-cmd "pg_isready -U booking -d booking_test"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
     env:
       # Matches backend/src/db/pool.js, which prefers DATABASE_URL when set.
-      DATABASE_URL: postgres://booking:booking@localhost:5432/booking
+      # This service is a fresh, disposable container for this job only, so
+      # backend/scripts/run-with-test-db.mjs's TEST_DATABASE_URL fallback
+      # (used for local runs) is unnecessary here - it just passes this
+      # DATABASE_URL through unchanged.
+      DATABASE_URL: postgres://booking:booking@localhost:5432/booking_test
       JWT_SECRET: test-jwt-secret-do-not-use-in-production
     steps:
       - name: Checkout

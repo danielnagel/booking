@@ -3,8 +3,26 @@ import pool from '../../src/db/pool.js';
 /**
  * Wipes all application tables so each test starts from a clean, known state.
  * Uses the real pool the app itself uses - no mocking.
+ *
+ * Refuses to run against anything whose database name doesn't look like a
+ * disposable test database: this truncates every table, and a misconfigured
+ * DATABASE_URL (e.g. accidentally pointing at the dev or a production
+ * database) must not be able to wipe it. See backend/scripts/run-with-test-db.js
+ * for how "test" DB npm scripts set DATABASE_URL from TEST_DATABASE_URL.
  */
 export async function resetDb() {
+  const {
+    rows: [{ current_database: dbName }],
+  } = await pool.query('SELECT current_database()');
+
+  if (!dbName.includes('test')) {
+    throw new Error(
+      `resetDb() weigert sich, Datenbank "${dbName}" zu leeren, da der Name nicht "test" ` +
+        'enthaelt. Isolierte Test-DB starten: docker compose --profile test up -d db-test, ' +
+        'TEST_DATABASE_URL in .env setzen (siehe .env.example).',
+    );
+  }
+
   await pool.query(
     'TRUNCATE TABLE bookings, password_reset_codes, invite_codes, users RESTART IDENTITY CASCADE',
   );

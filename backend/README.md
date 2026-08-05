@@ -65,7 +65,12 @@ Backend-Tests.
 
 Alle Endpunkte außer den Auth-Endpunkten erfordern das Auth-Cookie (Middleware
 `requireAuth`, `src/middleware/auth.js`); ohne gültiges Cookie antworten sie
-mit `401`.
+mit `401`. `requireAuth` prüft dafür bei jedem Request zusätzlich zur
+JWT-Signatur/-Gültigkeit, ob der User (`sub`-Claim) noch existiert – ein
+gelöschter User wird damit sofort ausgesperrt, statt bis zum Ablauf des
+Tokens (12h) weiter Zugriff zu haben. Ein Passwort-Reset invalidiert
+bestehende Sessions dagegen (noch) nicht – ein altes, aber noch gültiges
+Cookie funktioniert bis zum Ablauf weiter, auch nach einem Reset.
 
 ### Auth (`/api/auth`)
 

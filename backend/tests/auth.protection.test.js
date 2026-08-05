@@ -1,7 +1,8 @@
 import { beforeEach, afterAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
+import bcrypt from 'bcrypt';
 import app from '../src/app.js';
-import { resetDb, closeDb } from './helpers/db.js';
+import { resetDb, closeDb, pool, insertUser } from './helpers/db.js';
 
 beforeEach(async () => {
   await resetDb();
@@ -47,6 +48,24 @@ describe('access protection without a token', () => {
     const response = await request(app)
       .get('/api/bookings')
       .set('Cookie', ['token=not-a-real-jwt']);
+    expect(response.status).toBe(401);
+  });
+});
+
+describe('access with a still-valid session for a since-deleted user', () => {
+  it('rejects GET /api/auth/me once the user behind the session no longer exists', async () => {
+    const passwordHash = await bcrypt.hash('correcthorsebatterystaple', 10);
+    const user = await insertUser({ username: 'ghosted', passwordHash });
+
+    const agent = request.agent(app);
+    await agent
+      .post('/api/auth/login')
+      .send({ username: 'ghosted', password: 'correcthorsebatterystaple' });
+
+    await pool.query('DELETE FROM users WHERE id = $1', [user.id]);
+
+    const response = await agent.get('/api/auth/me');
+
     expect(response.status).toBe(401);
   });
 });

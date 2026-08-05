@@ -4,7 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "predev": "node scripts/apply-assets.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/apply-assets.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run"

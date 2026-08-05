@@ -29,9 +29,9 @@ WORKDIR /app/backend
 # (backend/src/routes/auth.js) marks the JWT cookie Secure when
 # NODE_ENV=production, which browsers refuse to store over plain HTTP. This
 # image is used by the root docker-compose.yml, which has no TLS termination
-# (that's added in Meilenstein 2 via my-webservers' nginx+certbot); setting
-# "production" here would silently break browser-based login over
-# http://localhost.
+# (that's added by whatever reverse proxy sits in front of it in a real
+# deployment); setting "production" here would silently break browser-based
+# login over http://localhost.
 
 EXPOSE 3000
 

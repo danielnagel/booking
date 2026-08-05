@@ -28,9 +28,10 @@ services:
       # NODE_ENV is intentionally left unset (not "production") here: the
       # backend marks its auth cookie Secure when NODE_ENV=production
       # (backend/src/routes/auth.js), which browsers refuse to store over
-      # plain HTTP. This compose file has no TLS termination (that's added in
-      # Meilenstein 2 via my-webservers' nginx+certbot), so login over
-      # http://localhost would silently break if this were "production".
+      # plain HTTP. This compose file has no TLS termination (that's added by
+      # whatever reverse proxy sits in front of it in a real deployment), so
+      # login over http://localhost would silently break if this were
+      # "production".
     depends_on:
       db:
         condition: service_healthy
@@ -46,6 +47,12 @@ services:
       - backend
     ports:
       - "${FRONTEND_PORT:-80}:80"
+    volumes:
+      # Overlay the generic default logo/favicon baked into the image with a
+      # custom one, without rebuilding. Point LOGO_FILE/FAVICON_FILE (in
+      # .env) at your own files; unset falls back to the generic defaults.
+      - ${LOGO_FILE:-./frontend/public/logo.default.svg}:/usr/share/nginx/html/logo.svg:ro
+      - ${FAVICON_FILE:-./frontend/public/favicon.default.svg}:/usr/share/nginx/html/favicon.svg:ro
 
 volumes:
   postgres-data:

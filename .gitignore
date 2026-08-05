@@ -29,3 +29,8 @@ npm-debug.log*
 
 # Docker volumes/data
 postgres-data/
+
+# Generated at dev/build time by frontend/scripts/apply-assets.mjs (copy of
+# either the generic default or a LOGO_FILE/FAVICON_FILE override).
+frontend/public/logo.svg
+frontend/public/favicon.svg

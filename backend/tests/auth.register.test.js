@@ -2,6 +2,7 @@ import { beforeEach, afterAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import app from '../src/app.js';
 import { resetDb, closeDb, insertInviteCode } from './helpers/db.js';
+import { PASSWORD_POLICY_MESSAGE } from '../src/lib/passwordPolicy.js';
 
 beforeEach(async () => {
   await resetDb();
@@ -19,11 +20,24 @@ describe('POST /api/auth/register', () => {
     expect(response.body.error).toBeTruthy();
   });
 
+  it('rejects a password that violates the password policy', async () => {
+    const code = await insertInviteCode();
+
+    const response = await request(app).post('/api/auth/register').send({
+      inviteCode: code,
+      username: 'newbandmember',
+      password: 'weakpassword',
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe(PASSWORD_POLICY_MESSAGE);
+  });
+
   it('rejects an invite code that does not exist', async () => {
     const response = await request(app).post('/api/auth/register').send({
       inviteCode: 'does-not-exist',
       username: 'newbandmember',
-      password: 'supersecret',
+      password: 'Sup3rSecret!123',
     });
 
     expect(response.status).toBe(400);
@@ -38,7 +52,7 @@ describe('POST /api/auth/register', () => {
     const response = await request(app).post('/api/auth/register').send({
       inviteCode: code,
       username: 'newbandmember',
-      password: 'supersecret',
+      password: 'Sup3rSecret!123',
     });
 
     expect(response.status).toBe(400);
@@ -53,7 +67,7 @@ describe('POST /api/auth/register', () => {
     const response = await request(app).post('/api/auth/register').send({
       inviteCode: code,
       username: 'newbandmember',
-      password: 'supersecret',
+      password: 'Sup3rSecret!123',
     });
 
     expect(response.status).toBe(400);
@@ -66,7 +80,7 @@ describe('POST /api/auth/register', () => {
     const response = await request(app).post('/api/auth/register').send({
       inviteCode: code,
       username: 'drummer',
-      password: 'supersecret',
+      password: 'Sup3rSecret!123',
     });
 
     expect(response.status).toBe(201);
@@ -79,12 +93,12 @@ describe('POST /api/auth/register', () => {
     const first = await request(app).post('/api/auth/register').send({
       inviteCode: code,
       username: 'guitarist',
-      password: 'supersecret',
+      password: 'Sup3rSecret!123',
     });
     const second = await request(app).post('/api/auth/register').send({
       inviteCode: code,
       username: 'bassist',
-      password: 'anothersecret',
+      password: 'Anoth3rSecret!12',
     });
 
     expect(first.status).toBe(201);
@@ -97,12 +111,12 @@ describe('POST /api/auth/register', () => {
     const first = await request(app).post('/api/auth/register').send({
       inviteCode: code,
       username: 'singer',
-      password: 'supersecret',
+      password: 'Sup3rSecret!123',
     });
     const second = await request(app).post('/api/auth/register').send({
       inviteCode: code,
       username: 'singer',
-      password: 'differentsecret',
+      password: 'D1fferentSecret!',
     });
 
     expect(first.status).toBe(201);

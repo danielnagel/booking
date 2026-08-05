@@ -103,3 +103,8 @@ jedem Push/PR gegen `main` aus.
   Benutzerverwaltung (Invite-Codes, Passwort-Reset).
 - [`frontend/README.md`](frontend/README.md) – Komponentenüberblick,
   Dev-Kommandos, Hinweis zum Gruppierungs-Verhalten der Tabelle.
+
+## Lizenz
+
+Dieses Projekt steht unter der PolyForm Noncommercial License 1.0.0, siehe
+[`LICENSE`](LICENSE).

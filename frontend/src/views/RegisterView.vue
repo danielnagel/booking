@@ -23,8 +23,8 @@ async function handleSubmit() {
   try {
     await authStore.register(form.inviteCode, form.username, form.password);
     router.push('/login');
-  } catch {
-    errorMessage.value = 'Registrierung fehlgeschlagen. Invite-Code oder Benutzername prüfen.';
+  } catch (err) {
+    errorMessage.value = err.message || 'Registrierung fehlgeschlagen. Invite-Code oder Benutzername prüfen.';
   } finally {
     isSubmitting.value = false;
   }

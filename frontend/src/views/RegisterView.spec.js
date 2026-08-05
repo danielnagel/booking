@@ -66,9 +66,7 @@ describe('RegisterView', () => {
     await fireEvent.update(screen.getByLabelText(/^Passwort/), 'secret123');
     await fireEvent.click(screen.getByRole('button', { name: 'Registrieren' }));
 
-    expect(
-      await screen.findByText('Registrierung fehlgeschlagen. Invite-Code oder Benutzername prüfen.'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('invalid invite code')).toBeInTheDocument();
     expect(router.currentRoute.value.path).toBe('/registrieren');
   });
 

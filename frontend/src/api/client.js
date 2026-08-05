@@ -62,7 +62,7 @@ async function request(path, { method = 'GET', body, params, headers } = {}) {
     : null;
 
   if (!response.ok) {
-    throw new ApiError(data?.message || 'Unbekannter Fehler', response.status, data);
+    throw new ApiError(data?.error || data?.message || 'Unbekannter Fehler', response.status, data);
   }
 
   return data;

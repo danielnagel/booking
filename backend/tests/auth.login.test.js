@@ -1,4 +1,4 @@
-import { beforeEach, afterAll, describe, expect, it } from 'vitest';
+import { beforeEach, afterAll, afterEach, describe, expect, it, vi } from 'vitest';
 import request from 'supertest';
 import bcrypt from 'bcrypt';
 import app from '../src/app.js';
@@ -12,6 +12,10 @@ afterAll(async () => {
   await closeDb();
 });
 
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
 describe('POST /api/auth/login', () => {
   it('rejects missing fields', async () => {
     const response = await request(app).post('/api/auth/login').send({});
@@ -19,23 +23,32 @@ describe('POST /api/auth/login', () => {
     expect(response.status).toBe(400);
   });
 
-  it('rejects an unknown username', async () => {
+  it('rejects an unknown username while still calling bcrypt.compare exactly once against a dummy hash (timing-attack parity)', async () => {
+    const compareSpy = vi.spyOn(bcrypt, 'compare');
+
     const response = await request(app)
       .post('/api/auth/login')
       .send({ username: 'ghost', password: 'whatever' });
 
     expect(response.status).toBe(401);
+    expect(compareSpy).toHaveBeenCalledTimes(1);
+    const [, comparedHash] = compareSpy.mock.calls[0];
+    expect(typeof comparedHash).toBe('string');
+    expect(comparedHash).not.toBeUndefined();
   });
 
-  it('rejects a wrong password', async () => {
+  it('rejects a wrong password while calling bcrypt.compare exactly once', async () => {
     const passwordHash = await bcrypt.hash('correcthorsebatterystaple', 10);
     await insertUser({ username: 'keyboarder', passwordHash });
+
+    const compareSpy = vi.spyOn(bcrypt, 'compare');
 
     const response = await request(app)
       .post('/api/auth/login')
       .send({ username: 'keyboarder', password: 'wrongpassword' });
 
     expect(response.status).toBe(401);
+    expect(compareSpy).toHaveBeenCalledTimes(1);
   });
 
   it('logs in with correct credentials and sets an httpOnly session cookie', async () => {

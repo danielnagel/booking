@@ -18,8 +18,8 @@ test('Admin erzeugt Passwort-Reset-Code per CLI, Nutzer setzt Passwort zurueck u
   const inviteCode = extractCodeFromOutput(inviteCliOutput);
 
   const username = `e2e-reset-${Date.now()}`;
-  const oldPassword = 'reset-e2e-altes-passwort-1';
-  const newPassword = 'reset-e2e-neues-passwort-2';
+  const oldPassword = 'Reset-E2e-Altes-Pw-1!';
+  const newPassword = 'Reset-E2e-Neues-Pw-2!';
 
   const registerResponse = await request.post('/api/auth/register', {
     data: { inviteCode, username, password: oldPassword },

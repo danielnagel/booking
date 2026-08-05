@@ -12,7 +12,7 @@ test('Admin erzeugt Invite-Code per CLI, Nutzer registriert sich damit und loggt
   const inviteCode = extractCodeFromOutput(cliOutput);
 
   const username = `e2e-invite-${Date.now()}`;
-  const password = 'invite-e2e-passwort-1';
+  const password = 'Invite-E2e-Passwort-1!';
 
   await page.goto('/registrieren');
   await page.getByLabel('Invite-Code').fill(inviteCode);

@@ -8,6 +8,7 @@ import {
   insertUser,
   insertPasswordResetCode,
 } from './helpers/db.js';
+import { PASSWORD_POLICY_MESSAGE } from '../src/lib/passwordPolicy.js';
 
 beforeEach(async () => {
   await resetDb();
@@ -29,10 +30,22 @@ describe('POST /api/auth/reset-password', () => {
     expect(response.status).toBe(400);
   });
 
+  it('rejects a password that violates the password policy', async () => {
+    const user = await createUser('violinist');
+    const code = await insertPasswordResetCode({ userId: user.id });
+
+    const response = await request(app)
+      .post('/api/auth/reset-password')
+      .send({ resetCode: code, newPassword: 'weakpassword' });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe(PASSWORD_POLICY_MESSAGE);
+  });
+
   it('rejects a reset code that does not exist', async () => {
     const response = await request(app)
       .post('/api/auth/reset-password')
-      .send({ resetCode: 'does-not-exist', newPassword: 'brandnewpassword' });
+      .send({ resetCode: 'does-not-exist', newPassword: 'Br4ndNewPassword!' });
 
     expect(response.status).toBe(400);
     expect(response.body.error).toMatch(/Reset-Code/);
@@ -47,7 +60,7 @@ describe('POST /api/auth/reset-password', () => {
 
     const response = await request(app)
       .post('/api/auth/reset-password')
-      .send({ resetCode: code, newPassword: 'brandnewpassword' });
+      .send({ resetCode: code, newPassword: 'Br4ndNewPassword!' });
 
     expect(response.status).toBe(400);
     expect(response.body.error).toMatch(/Reset-Code/);
@@ -62,7 +75,7 @@ describe('POST /api/auth/reset-password', () => {
 
     const response = await request(app)
       .post('/api/auth/reset-password')
-      .send({ resetCode: code, newPassword: 'brandnewpassword' });
+      .send({ resetCode: code, newPassword: 'Br4ndNewPassword!' });
 
     expect(response.status).toBe(400);
     expect(response.body.error).toMatch(/Reset-Code/);
@@ -74,7 +87,7 @@ describe('POST /api/auth/reset-password', () => {
 
     const response = await request(app)
       .post('/api/auth/reset-password')
-      .send({ resetCode: code, newPassword: 'brandnewpassword' });
+      .send({ resetCode: code, newPassword: 'Br4ndNewPassword!' });
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ success: true });
@@ -86,7 +99,7 @@ describe('POST /api/auth/reset-password', () => {
 
     const newPasswordLogin = await request(app)
       .post('/api/auth/login')
-      .send({ username: 'violinist', password: 'brandnewpassword' });
+      .send({ username: 'violinist', password: 'Br4ndNewPassword!' });
     expect(newPasswordLogin.status).toBe(200);
   });
 
@@ -96,10 +109,10 @@ describe('POST /api/auth/reset-password', () => {
 
     const first = await request(app)
       .post('/api/auth/reset-password')
-      .send({ resetCode: code, newPassword: 'brandnewpassword' });
+      .send({ resetCode: code, newPassword: 'Br4ndNewPassword!' });
     const second = await request(app)
       .post('/api/auth/reset-password')
-      .send({ resetCode: code, newPassword: 'yetanotherpassword' });
+      .send({ resetCode: code, newPassword: 'Y3tAnotherPassword!' });
 
     expect(first.status).toBe(200);
     expect(second.status).toBe(400);
@@ -112,7 +125,7 @@ describe('POST /api/auth/reset-password', () => {
 
     const response = await request(app)
       .post('/api/auth/reset-password')
-      .send({ resetCode: code, newPassword: 'brandnewpassword' });
+      .send({ resetCode: code, newPassword: 'Br4ndNewPassword!' });
     expect(response.status).toBe(200);
 
     const otherUserOldPasswordLogin = await request(app)

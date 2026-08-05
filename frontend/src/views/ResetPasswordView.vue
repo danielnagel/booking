@@ -22,8 +22,8 @@ async function handleSubmit() {
   try {
     await authStore.resetPassword(form.resetCode, form.newPassword);
     router.push('/login');
-  } catch {
-    errorMessage.value = 'Zurücksetzen fehlgeschlagen. Reset-Code prüfen.';
+  } catch (err) {
+    errorMessage.value = err.message || 'Zurücksetzen fehlgeschlagen. Reset-Code prüfen.';
   } finally {
     isSubmitting.value = false;
   }

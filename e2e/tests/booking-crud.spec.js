@@ -29,7 +29,7 @@ test('Login, Eintrag anlegen, in Übersicht bestätigen, per Suche finden, bearb
   const inviteCode = extractCodeFromOutput(inviteCliOutput);
 
   const username = `e2e-crud-${Date.now()}`;
-  const password = 'crud-e2e-passwort-1';
+  const password = 'Crud-E2e-Passwort-1!';
 
   const registerResponse = await request.post('/api/auth/register', {
     data: { inviteCode, username, password },

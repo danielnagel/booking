@@ -3,20 +3,30 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import pool from '../db/pool.js';
 import { requireAuth } from '../middleware/auth.js';
+import { authRateLimiter } from '../middleware/rateLimit.js';
+import { isPasswordValid, PASSWORD_POLICY_MESSAGE } from '../lib/passwordPolicy.js';
 
 const router = Router();
 
 const BCRYPT_ROUNDS = 10;
 const JWT_EXPIRES_IN = '12h';
 const COOKIE_MAX_AGE_MS = 12 * 60 * 60 * 1000;
+const DUMMY_PASSWORD_HASH = await bcrypt.hash(
+  'dummy-password-for-timing-parity',
+  BCRYPT_ROUNDS,
+);
 
-router.post('/register', async (req, res) => {
+router.post('/register', authRateLimiter, async (req, res) => {
   const { inviteCode, username, password } = req.body ?? {};
 
   if (!inviteCode || !username || !password) {
     return res
       .status(400)
       .json({ error: 'inviteCode, username und password sind erforderlich.' });
+  }
+
+  if (!isPasswordValid(password)) {
+    return res.status(400).json({ error: PASSWORD_POLICY_MESSAGE });
   }
 
   const { rows: inviteRows } = await pool.query(
@@ -50,13 +60,17 @@ router.post('/register', async (req, res) => {
   return res.status(201).json({ username });
 });
 
-router.post('/reset-password', async (req, res) => {
+router.post('/reset-password', authRateLimiter, async (req, res) => {
   const { resetCode, newPassword } = req.body ?? {};
 
   if (!resetCode || !newPassword) {
     return res
       .status(400)
       .json({ error: 'resetCode und newPassword sind erforderlich.' });
+  }
+
+  if (!isPasswordValid(newPassword)) {
+    return res.status(400).json({ error: PASSWORD_POLICY_MESSAGE });
   }
 
   const { rows } = await pool.query(
@@ -86,7 +100,7 @@ router.post('/reset-password', async (req, res) => {
   return res.status(200).json({ success: true });
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', authRateLimiter, async (req, res) => {
   const { username, password } = req.body ?? {};
 
   if (!username || !password) {
@@ -100,14 +114,13 @@ router.post('/login', async (req, res) => {
     [username],
   );
 
-  if (rows.length === 0) {
-    return res.status(401).json({ error: 'Username oder Passwort falsch.' });
-  }
+  const user = rows[0] ?? null;
+  const passwordMatches = await bcrypt.compare(
+    password,
+    user?.password_hash ?? DUMMY_PASSWORD_HASH,
+  );
 
-  const user = rows[0];
-  const passwordMatches = await bcrypt.compare(password, user.password_hash);
-
-  if (!passwordMatches) {
+  if (!user || !passwordMatches) {
     return res.status(401).json({ error: 'Username oder Passwort falsch.' });
   }
 

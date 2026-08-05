@@ -65,9 +65,7 @@ describe('ResetPasswordView', () => {
     await fireEvent.update(screen.getByLabelText(/^Neues Passwort/), 'newSecret123');
     await fireEvent.click(screen.getByRole('button', { name: 'Passwort zurücksetzen' }));
 
-    expect(
-      await screen.findByText('Zurücksetzen fehlgeschlagen. Reset-Code prüfen.'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('invalid reset code')).toBeInTheDocument();
     expect(router.currentRoute.value.path).toBe('/passwort-zuruecksetzen');
   });
 

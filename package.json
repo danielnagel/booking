@@ -11,6 +11,7 @@
   ],
   "scripts": {
     "lint": "eslint .",
+    "test": "npm run lint && npm test --workspace=backend && npm test --workspace=frontend",
     "test:e2e": "npm run test:e2e --workspace=e2e",
     "update": "npx npm-check-updates -u --workspaces --root && npm install"
   },

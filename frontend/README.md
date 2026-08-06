@@ -1,73 +1,72 @@
 # Frontend
 
-Vue 3 + Vite + Tailwind CSS. Auth-State über Pinia, Routing über Vue Router
-mit Auth-Guard, Übersichtstabelle über das headless `@tanstack/vue-table`.
+Vue 3 + Vite + Tailwind CSS. Auth state via Pinia, routing via Vue Router
+with an auth guard, overview table via the headless `@tanstack/vue-table`.
 
-## Dev-Kommandos
+## Dev commands
 
 ```bash
-npm run dev --workspace=frontend      # Vite-Dev-Server mit Hot-Reload, proxied /api auf http://localhost:3000
-npm run build --workspace=frontend    # Produktions-Build nach dist/
-npm run preview --workspace=frontend  # gebauten dist/-Output lokal servieren
+npm run dev --workspace=frontend      # Vite dev server with hot reload, proxies /api to http://localhost:3000
+npm run build --workspace=frontend    # production build to dist/
+npm run preview --workspace=frontend  # serve the built dist/ output locally
 npm test --workspace=frontend         # Vitest + @testing-library/vue
 ```
 
-Der Dev-Server-Proxy (`vite.config.js`) erwartet ein lokal laufendes Backend
-auf Port 3000 (`npm run dev --workspace=backend`).
+The dev server proxy (`vite.config.js`) expects a locally running backend
+on port 3000 (`npm run dev --workspace=backend`).
 
-## Komponentenüberblick
+## Component overview
 
-- **`App.vue`** – Wurzelkomponente, bindet `AppHeader`/`AppFooter` fest um
-  `<router-view>` ein, erscheinen also auf jeder Seite inkl. Login/
-  Registrieren/Passwort-Reset.
-- **`router/index.js`** – Routen `/login`, `/registrieren`,
-  `/passwort-zuruecksetzen`, `/` (Übersicht), `/eingabe` (neuer Eintrag) und
-  `/eingabe/:id` (bearbeiten, selbe Komponente wie Anlegen). Ein
-  Navigation-Guard prüft vor jedem Routenwechsel den Auth-Status und leitet
-  bei fehlender Session zu `/login` um.
-- **`stores/auth.js`** (Pinia) – Login/Logout/Registrierung/Passwort-Reset
-  sowie der aktuell eingeloggte Nutzer; `fetchCurrentUser()` prüft die
-  Session beim App-Start über `GET /api/auth/me`.
-- **`api/client.js`** – fetch-Wrapper mit `credentials: 'include'` (nutzt das
-  httpOnly-Auth-Cookie) und zentraler `401`-Behandlung (Redirect zu
-  `/login`, außer bei der initialen `/auth/me`-Prüfung selbst).
-- **`views/LoginView.vue`** – Login-Formular mit Links zu `/registrieren` und
+- **`App.vue`** – root component, wraps `<router-view>` with
+  `AppHeader`/`AppFooter`, so they appear on every page including login/
+  register/password reset.
+- **`router/index.js`** – routes `/login`, `/registrieren`,
+  `/passwort-zuruecksetzen`, `/` (overview), `/eingabe` (new entry) and
+  `/eingabe/:id` (edit, same component as create). A navigation guard checks
+  the auth status before every route change and redirects to `/login` if
+  there is no session.
+- **`stores/auth.js`** (Pinia) – login/logout/registration/password reset
+  and the currently logged-in user; `fetchCurrentUser()` checks the session
+  on app start via `GET /api/auth/me`.
+- **`api/client.js`** – fetch wrapper with `credentials: 'include'` (uses
+  the httpOnly auth cookie) and centralized `401` handling (redirects to
+  `/login`, except for the initial `/auth/me` check itself).
+- **`views/LoginView.vue`** – login form with links to `/registrieren` and
   `/passwort-zuruecksetzen`.
-- **`views/RegisterView.vue`** – Registrierung mit Invite-Code, Username und
-  Passwort.
-- **`views/ResetPasswordView.vue`** – Passwort-Reset mit Reset-Code und neuem
-  Passwort (kein Username-Feld, siehe Backend-README).
-- **`views/OverviewView.vue`** – lädt Bookings serverseitig (Suche,
-  Sortierung, Paging), rendert `BookingTable` und den "Neuer
-  Eintrag"-Button, steuert das Lösch-Bestätigungsdialog.
-- **`views/EntryFormView.vue`** – wird sowohl für `/eingabe` (Anlegen) als
-  auch `/eingabe/:id` (Bearbeiten) verwendet, lädt im Edit-Fall den
-  bestehenden Eintrag und rendert `BookingForm`.
-- **`components/AppHeader.vue`** – Band-Logo oben links, nur auf Desktop
-  sichtbar (`hidden md:flex`).
-- **`components/AppFooter.vue`** – dasselbe Logo unten, nur auf Mobile
-  sichtbar (`md:hidden`).
-- **`components/BookingTable.vue`** – Übersichtstabelle auf Basis von
-  `@tanstack/vue-table`: globale Suche (debounced), Spalten-Sortierung,
-  Gruppierung, Paging-Steuerung. Spaltenüberschrift für die Gage lautet
+- **`views/RegisterView.vue`** – registration with invite code, username and
+  password.
+- **`views/ResetPasswordView.vue`** – password reset with reset code and new
+  password (no username field, see backend README).
+- **`views/OverviewView.vue`** – loads bookings server-side (search, sort,
+  paging), renders `BookingTable` and the "New entry" button, controls the
+  delete confirmation dialog.
+- **`views/EntryFormView.vue`** – used for both `/eingabe` (create) and
+  `/eingabe/:id` (edit); in the edit case it loads the existing entry and
+  renders `BookingForm`.
+- **`components/AppHeader.vue`** – logo top left, visible only on desktop
+  (`hidden md:flex`).
+- **`components/AppFooter.vue`** – the same logo at the bottom, visible only
+  on mobile (`md:hidden`).
+- **`components/BookingTable.vue`** – overview table based on
+  `@tanstack/vue-table`: global search (debounced), column sorting,
+  grouping, paging controls. The column header for the fee reads
   "Gage (€)".
-- **`components/BookingForm.vue`** – Eingabemaske, wird von Anlegen und
-  Bearbeiten wiederverwendet (per `isEditMode`-Prop gesteuert). Einziges
-  Pflichtfeld: Veranstaltungsname. Zwei Submit-Buttons: "Hinzufügen und
-  nächster Eintrag" (speichert, setzt das Formular zurück, bleibt auf der
-  Seite) und "Hinzufügen und zurück zur Übersicht" (speichert, navigiert zu
-  `/`); im Edit-Modus entsprechend "Speichern und ..."-Varianten.
-- **`components/FormField.vue`** – generisches Label+Input, wird von
-  `BookingForm` für jedes der zehn sichtbaren Felder genutzt (die Metadaten
-  `created_by`/`created_at`/`updated_by`/`updated_at` sind kein Formularfeld).
-- **`components/ConfirmDialog.vue`** – generischer Lösch-Bestätigungsdialog.
+- **`components/BookingForm.vue`** – entry form, reused for create and edit
+  (controlled via the `isEditMode` prop). Only required field: event name.
+  Two submit buttons: "Hinzufügen und nächster Eintrag" (saves, resets the
+  form, stays on the page) and "Hinzufügen und zurück zur Übersicht" (saves,
+  navigates to `/`); in edit mode the equivalent "Speichern und ..."
+  variants.
+- **`components/FormField.vue`** – generic label+input, used by
+  `BookingForm` for each of the ten visible fields (the `created_by`/
+  `created_at`/`updated_by`/`updated_at` metadata is not a form field).
+- **`components/ConfirmDialog.vue`** – generic delete confirmation dialog.
 
-## Bekanntes Verhalten: Gruppierung + serverseitiges Paging
+## Known behavior: grouping + server-side paging
 
-Suche, Sortierung und Paging laufen serverseitig – das Frontend hat zu jedem
-Zeitpunkt nur die aktuell geladene Seite (max. 50 Zeilen) im Speicher. Die
-Gruppierungs-Funktion von `@tanstack/vue-table` in `BookingTable.vue`
-gruppiert deshalb **nur innerhalb der aktuell geladenen Seite**, nicht über
-den gesamten Datenbestand. Ein Eintrag, der auf einer anderen Seite liegt,
-taucht in der Gruppierung der aktuellen Seite nicht mit auf. Das ist
-bewusstes, bekanntes Verhalten und kein Bug.
+Search, sorting and paging run server-side – the frontend only ever holds
+the currently loaded page (max. 50 rows) in memory. The grouping feature of
+`@tanstack/vue-table` in `BookingTable.vue` therefore groups **only within
+the currently loaded page**, not across the entire dataset. An entry on a
+different page will not show up in the current page's grouping. This is
+intentional, known behavior and not a bug.

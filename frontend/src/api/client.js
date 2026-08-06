@@ -12,9 +12,9 @@ class ApiError extends Error {
 }
 
 /**
- * fetch-Wrapper mit `credentials: 'include'` (httpOnly-JWT-Cookie) und
- * zentraler 401-Behandlung: bei abgelaufener/fehlender Session wird zu
- * `/login` weitergeleitet.
+ * fetch wrapper with `credentials: 'include'` (httpOnly JWT cookie) and
+ * centralized 401 handling: on an expired/missing session, redirects to
+ * `/login`.
  */
 async function request(path, { method = 'GET', body, params, headers } = {}) {
   let url = `${API_BASE}${path}`;

@@ -13,7 +13,7 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    /** Prüft die Session beim App-Start via GET /api/auth/me. */
+    /** Checks the session on app start via GET /api/auth/me. */
     async fetchCurrentUser() {
       try {
         const data = await apiClient.get('/auth/me');

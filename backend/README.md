@@ -1,120 +1,119 @@
 # Backend
 
-Express-API unter `/api`, PostgreSQL über `pg` + `node-pg-migrate`. Auth läuft
-über ein JWT, das als httpOnly-, `SameSite=Strict`-Cookie gesetzt wird (kein
+Express API under `/api`, PostgreSQL via `pg` + `node-pg-migrate`. Auth is
+handled via a JWT set as an httpOnly, `SameSite=Strict` cookie (no
 `localStorage`).
 
-## Dev-Kommandos
+## Dev commands
 
 ```bash
-npm run dev --workspace=backend    # nodemon src/server.js, Hot-Reload
-npm run start --workspace=backend  # node src/server.js (ohne Hot-Reload)
-npm test --workspace=backend       # Vitest + Supertest (führt Migrationen vorher via "pretest" aus)
+npm run dev --workspace=backend    # nodemon src/server.js, hot reload
+npm run start --workspace=backend  # node src/server.js (without hot reload)
+npm test --workspace=backend       # Vitest + Supertest (runs migrations beforehand via "pretest")
 ```
 
-**Tests brauchen eine eigene, isolierte Datenbank** – `tests/helpers/db.js`
-leert vor jedem Test alle Tabellen (`TRUNCATE ... RESTART IDENTITY CASCADE`).
-Einmal lief das versehentlich gegen die echte lokale Dev-Datenbank statt einer
-Test-DB, weswegen es jetzt zwei Absicherungen gibt:
+**Tests need their own, isolated database** – `tests/helpers/db.js` truncates
+all tables before every test (`TRUNCATE ... RESTART IDENTITY CASCADE`). This
+once ran accidentally against the real local dev database instead of a test
+DB, which is why there are now two safeguards:
 
-1. `npm test`/`npm run pretest` laufen über
-   `scripts/run-with-test-db.js`, das `DATABASE_URL` zwingend auf
-   `TEST_DATABASE_URL` (aus `.env`) umbiegt.
-2. `resetDb()` prüft zusätzlich den tatsächlichen Datenbanknamen und bricht
-   mit einem Fehler ab, falls er nicht `"test"` enthält – unabhängig davon,
-   wie `DATABASE_URL` zustande kam.
+1. `npm test`/`npm run pretest` run via
+   `scripts/run-with-test-db.js`, which forces `DATABASE_URL` to
+   `TEST_DATABASE_URL` (from `.env`).
+2. `resetDb()` additionally checks the actual database name and aborts with
+   an error if it doesn't contain `"test"` – regardless of how
+   `DATABASE_URL` was set.
 
-Vor dem ersten lokalen Testlauf einmalig die isolierte Test-DB starten
-(separater Postgres-Container, eigener Port, kein persistentes Volume – siehe
-`docker-compose.yml`, Service `db-test`):
+Before the first local test run, start the isolated test DB once (separate
+Postgres container, own port, no persistent volume – see
+`docker-compose.yml`, service `db-test`):
 
 ```bash
 docker compose --profile test up -d db-test
 ```
 
-`.env.example` enthält die zugehörigen `TEST_POSTGRES_*`/`TEST_DATABASE_URL`-
-Variablen mit funktionierenden Defaults für Port `5433`.
+`.env.example` contains the corresponding `TEST_POSTGRES_*`/
+`TEST_DATABASE_URL` variables with working defaults for port `5433`.
 
-## Umgebungsvariablen
+## Environment variables
 
-Werden aus `.env` gelesen (siehe `.env.example` am Repo-Root; lokal per
-`dotenv` geladen, siehe `src/db/pool.js`/`src/server.js`):
+Read from `.env` (see `.env.example` at the repo root; loaded locally via
+`dotenv`, see `src/db/pool.js`/`src/server.js`):
 
-- `DATABASE_URL` – vollständiger Postgres-Connection-String. Ist er gesetzt,
-  hat er Vorrang vor den einzelnen `PGHOST`/`PGPORT`/`PGUSER`/`PGPASSWORD`/
-  `PGDATABASE`-Variablen (Fallback bei lokalem Betrieb ohne Docker).
-- `JWT_SECRET` – Secret zum Signieren/Verifizieren des Auth-Cookies.
-- `PORT` – Port, auf dem die Express-App lauscht (Default `3000`).
-- `NODE_ENV` – wird auf `production` gesetzt, damit das Auth-Cookie zusätzlich
-  `Secure` ist (setzt TLS-Terminierung davor voraus, siehe Meilenstein 2).
-- `TRUST_PROXY_HOPS` – Anzahl der Reverse-Proxy-Hops vor diesem Service
-  (Default `0` = direkte Verbindung, kein Proxy). Muss exakt der echten
-  Hop-Zahl der jeweiligen Umgebung entsprechen, siehe Kommentar in
-  `src/app.js` (falsch gesetzt bricht entweder `authRateLimiter`s
-  Pro-IP-Zählung oder – falls zu großzügig – lässt sich per gefälschtem
-  `X-Forwarded-For` umgehen). Das lokale `docker-compose.yml` setzt dafür
-  bereits `1` (ein `frontend`-nginx-Hop).
+- `DATABASE_URL` – full Postgres connection string. If set, it takes
+  precedence over the individual `PGHOST`/`PGPORT`/`PGUSER`/`PGPASSWORD`/
+  `PGDATABASE` variables (fallback for local operation without Docker).
+- `JWT_SECRET` – secret for signing/verifying the auth cookie.
+- `PORT` – port the Express app listens on (default `3000`).
+- `NODE_ENV` – set to `production` so the auth cookie is additionally
+  `Secure` (requires TLS termination in front of it, see milestone 2).
+- `TRUST_PROXY_HOPS` – number of reverse proxy hops in front of this service
+  (default `0` = direct connection, no proxy). Must exactly match the real
+  hop count of the given environment, see the comment in `src/app.js`
+  (set incorrectly, it either breaks `authRateLimiter`'s per-IP counting or
+  – if too generous – can be bypassed via a spoofed `X-Forwarded-For`). The
+  local `docker-compose.yml` already sets this to `1` (one `frontend` nginx
+  hop).
 
-## Migrationen
+## Migrations
 
 ```bash
-npm run migrate --workspace=backend        # alle offenen Migrationen anwenden
-npm run migrate:down --workspace=backend   # letzte Migration zurückrollen
+npm run migrate --workspace=backend        # apply all pending migrations
+npm run migrate:down --workspace=backend   # roll back the last migration
 ```
 
-Migrationen liegen unter `migrations/` (`node-pg-migrate`) und legen die
-Tabellen `users`, `invite_codes`, `password_reset_codes` und `bookings` an.
-Im Docker-Compose-Stack laufen sie automatisch beim Start des
-`backend`-Containers (siehe `Dockerfile`); im CI-Lauf via `pretest` vor den
-Backend-Tests.
+Migrations live under `migrations/` (`node-pg-migrate`) and create the
+`users`, `invite_codes`, `password_reset_codes` and `bookings` tables. In the
+Docker Compose stack they run automatically on `backend` container startup
+(see `Dockerfile`); in CI via `pretest` before the backend tests.
 
-## API-Endpunkte
+## API endpoints
 
-Alle Endpunkte außer den Auth-Endpunkten erfordern das Auth-Cookie (Middleware
-`requireAuth`, `src/middleware/auth.js`); ohne gültiges Cookie antworten sie
-mit `401`. `requireAuth` prüft dafür bei jedem Request zusätzlich zur
-JWT-Signatur/-Gültigkeit, ob der User (`sub`-Claim) noch existiert – ein
-gelöschter User wird damit sofort ausgesperrt, statt bis zum Ablauf des
-Tokens (12h) weiter Zugriff zu haben. Ein Passwort-Reset invalidiert
-bestehende Sessions dagegen (noch) nicht – ein altes, aber noch gültiges
-Cookie funktioniert bis zum Ablauf weiter, auch nach einem Reset.
+All endpoints except the auth endpoints require the auth cookie (middleware
+`requireAuth`, `src/middleware/auth.js`); without a valid cookie they
+respond with `401`. For every request, `requireAuth` also checks, in
+addition to the JWT signature/validity, whether the user (`sub` claim)
+still exists – a deleted user is thus locked out immediately instead of
+retaining access until the token expires (12h). A password reset, however,
+does (not yet) invalidate existing sessions – an old but still valid cookie
+keeps working until it expires, even after a reset.
 
 ### Auth (`/api/auth`)
 
-| Methode | Pfad | Body | Beschreibung |
+| Method | Path | Body | Description |
 | --- | --- | --- | --- |
-| `POST` | `/api/auth/register` | `{ inviteCode, username, password }` | Legt einen Nutzer an, sofern der Invite-Code gültig (nicht abgelaufen, nicht deaktiviert) und der Username noch frei ist. |
-| `POST` | `/api/auth/reset-password` | `{ resetCode, newPassword }` | Setzt das Passwort des an `resetCode` gebundenen Nutzers neu, sofern der Code gültig und noch nicht verwendet ist; markiert ihn danach als verwendet. Kein Username-Feld nötig. |
-| `POST` | `/api/auth/login` | `{ username, password }` | Prüft Zugangsdaten, setzt bei Erfolg das JWT-Auth-Cookie (12h gültig). |
-| `GET` | `/api/auth/me` | – | Liefert `{ id, username }` des eingeloggten Nutzers, sonst `401`. Wird vom Frontend beim App-Start zur Session-Prüfung genutzt. |
+| `POST` | `/api/auth/register` | `{ inviteCode, username, password }` | Creates a user, provided the invite code is valid (not expired, not revoked) and the username is still available. |
+| `POST` | `/api/auth/reset-password` | `{ resetCode, newPassword }` | Resets the password of the user bound to `resetCode`, provided the code is valid and not yet used; marks it as used afterwards. No username field needed. |
+| `POST` | `/api/auth/login` | `{ username, password }` | Checks credentials, sets the JWT auth cookie on success (valid for 12h). |
+| `GET` | `/api/auth/me` | – | Returns `{ id, username }` of the logged-in user, otherwise `401`. Used by the frontend on app start to check the session. |
 
-### Bookings (`/api/bookings`, jeweils hinter `requireAuth`)
+### Bookings (`/api/bookings`, each behind `requireAuth`)
 
-| Methode | Pfad | Beschreibung |
+| Method | Path | Description |
 | --- | --- | --- |
-| `GET` | `/api/bookings` | Liste mit Query-Parametern `search` (ILIKE über alle Textspalten), `sortBy`/`sortDir` (`asc`/`desc`), `page` (1-basiert). Feste `pageSize` von 50. Antwort: `{ data, page, pageSize, total }`. |
-| `GET` | `/api/bookings/:id` | Einzelnen Eintrag laden. |
-| `POST` | `/api/bookings` | Neuen Eintrag anlegen. Einziges Pflichtfeld: `event_name`. `created_by` wird serverseitig aus dem JWT gesetzt. |
-| `PUT` | `/api/bookings/:id` | Eintrag aktualisieren (gleiche Felder wie beim Anlegen, `event_name` weiterhin Pflicht). `updated_by`/`updated_at` werden serverseitig gesetzt. Kein Owner-Check – jeder eingeloggte Nutzer darf jeden Eintrag ändern. |
-| `DELETE` | `/api/bookings/:id` | Eintrag löschen. Kein Owner-Check. |
+| `GET` | `/api/bookings` | List with query parameters `search` (ILIKE across all text columns), `sortBy`/`sortDir` (`asc`/`desc`), `page` (1-based). Fixed `pageSize` of 50. Response: `{ data, page, pageSize, total }`. |
+| `GET` | `/api/bookings/:id` | Load a single entry. |
+| `POST` | `/api/bookings` | Create a new entry. Only required field: `event_name`. `created_by` is set server-side from the JWT. |
+| `PUT` | `/api/bookings/:id` | Update an entry (same fields as on create, `event_name` still required). `updated_by`/`updated_at` are set server-side. No owner check – any logged-in user may modify any entry. |
+| `DELETE` | `/api/bookings/:id` | Delete an entry. No owner check. |
 
-Schreibbare Felder bei `POST`/`PUT`: `event_name`, `event_date`, `organizer`,
+Writable fields on `POST`/`PUT`: `event_name`, `event_date`, `organizer`,
 `organizer_website`, `organizer_email`, `application_text`, `venue_street`,
-`venue_zip`, `venue_city`, `fee`. Die Metadaten `created_by`, `created_at`,
-`updated_by`, `updated_at` werden in den Antworten mitgeliefert, sind aber
-reine DB-Metadaten und werden vom Client nicht gesetzt.
+`venue_zip`, `venue_city`, `fee`. The `created_by`, `created_at`,
+`updated_by`, `updated_at` metadata is included in responses but is purely
+DB metadata and is not set by the client.
 
-## Benutzerverwaltung
+## User management
 
-Es gibt **keine offene Selbstregistrierung**: Ein neuer Nutzer kann sich nur
-mit einem gültigen Invite-Code registrieren. Alle folgenden Befehle sind
-CLI-Skripte im Backend-Package (`backend/src/cli/`) und verbinden sich über
-dieselbe `DATABASE_URL` wie die API zur Datenbank.
+There is **no open self-registration**: a new user can only register with a
+valid invite code. All of the following commands are CLI scripts in the
+backend package (`backend/src/cli/`) and connect to the database via the
+same `DATABASE_URL` as the API.
 
-**Wichtig:** Diese Befehle sind für den Betrieb gegen die produktive
-Datenbank gedacht, nicht für die lokale Entwicklung. Sie werden deshalb **im
-laufenden Backend-Container** ausgeführt, nicht lokal auf dem
-Entwickler-Rechner:
+**Important:** these commands are intended for operating against the
+production database, not for local development. They are therefore run
+**inside the running backend container**, not locally on the developer
+machine:
 
 ```bash
 docker compose exec backend npm run invite:create
@@ -124,32 +123,31 @@ docker compose exec backend npm run password-reset:create -- <username>
 docker compose exec backend npm run user:list
 ```
 
-(Voraussetzung: der `backend`-Service läuft, z. B. via
+(Prerequisite: the `backend` service is running, e.g. via
 `docker compose up -d backend db`.)
 
-### Invite-Codes
+### Invite codes
 
-- `invite:create` – erzeugt einen neuen Invite-Code, gibt Code und
-  Ablaufdatum auf der Konsole aus. **30 Tage** ab Erstellung gültig und in
-  dieser Zeit **beliebig oft wiederverwendbar** – ein Code kann z. B. einmal
-  in der Bandgruppe geteilt werden, jedes Mitglied registriert sich damit
-  selbst.
-- `invite:list` – listet alle aktiven (nicht abgelaufenen, nicht
-  deaktivierten) Invite-Codes mit Erstellungs- und Ablaufdatum auf.
-- `invite:revoke -- <code>` – deaktiviert einen aktiven Invite-Code sofort
-  (setzt `revoked_at`); danach schlägt eine Registrierung mit diesem Code
-  fehl.
+- `invite:create` – generates a new invite code, prints the code and
+  expiry date to the console. Valid for **30 days** from creation and
+  **reusable any number of times** during that period – a code can, for
+  example, be shared once in the team chat, with each member registering
+  themselves.
+- `invite:list` – lists all active (not expired, not revoked) invite codes
+  with their creation and expiry dates.
+- `invite:revoke -- <code>` – immediately revokes an active invite code
+  (sets `revoked_at`); registration with this code then fails.
 
-### Passwort-Reset
+### Password reset
 
-- `password-reset:create -- <username>` – erzeugt für einen **bestehenden**
-  Nutzer einen Passwort-Reset-Code, gibt Code und Ablaufdatum auf der Konsole
-  aus. **72h** gültig und **einmal verwendbar** (nach erfolgreichem Reset über
-  `POST /api/auth/reset-password` wird der Code gesperrt). Der Code ist
-  serverseitig bereits an den Nutzer gebunden, beim Zurücksetzen ist daher nur
-  Code + neues Passwort nötig, kein Username.
+- `password-reset:create -- <username>` – generates a password reset code
+  for an **existing** user, prints the code and expiry date to the console.
+  Valid for **72h** and **single-use** (after a successful reset via
+  `POST /api/auth/reset-password` the code is locked). The code is already
+  bound to the user server-side, so resetting only requires the code plus
+  the new password, no username.
 
-### Benutzer-Übersicht
+### User overview
 
-- `user:list` – listet alle Nutzer mit Erstellungsdatum und letztem Login auf
-  (`nie`, falls noch kein Login stattgefunden hat).
+- `user:list` – lists all users with their creation date and last login
+  (`nie`, if no login has occurred yet).

@@ -21,15 +21,15 @@
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "express-rate-limit": "^8.0.0",
-    "jsonwebtoken": "^9.0.2",
-    "node-pg-migrate": "^7.9.1",
-    "pg": "^8.16.3"
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.6.2",
+    "jsonwebtoken": "^9.0.3",
+    "node-pg-migrate": "^9.0.0",
+    "pg": "^8.22.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10",
+    "nodemon": "^3.1.14",
     "supertest": "^7.2.2",
     "vitest": "^4.1.10"
   }

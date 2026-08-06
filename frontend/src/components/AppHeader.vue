@@ -1,3 +1,18 @@
+<script setup>
+import { useRoute, useRouter } from 'vue-router';
+
+import { useAuthStore } from '../stores/auth';
+
+const authStore = useAuthStore();
+const router = useRouter();
+const route = useRoute();
+
+async function handleLogout() {
+  await authStore.logout();
+  router.push('/login');
+}
+</script>
+
 <template>
   <header class="hidden md:flex items-center px-6 py-4 bg-secondary text-primary">
     <router-link
@@ -11,5 +26,14 @@
       >
       <span class="text-lg font-semibold">Booking</span>
     </router-link>
+
+    <button
+      v-if="route.name === 'overview'"
+      type="button"
+      class="ml-4 text-xs text-primary/60 hover:underline"
+      @click="handleLogout"
+    >
+      Logout
+    </button>
   </header>
 </template>

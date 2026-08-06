@@ -28,6 +28,7 @@ const SORTABLE_COLUMNS = [
   'venue_zip',
   'venue_city',
   'fee',
+  'status',
 ];
 
 const WRITABLE_FIELDS = [
@@ -41,7 +42,10 @@ const WRITABLE_FIELDS = [
   'venue_zip',
   'venue_city',
   'fee',
+  'status',
 ];
+
+const STATUS_VALUES = ['offen', 'angenommen', 'abgelehnt', 'storniert'];
 
 function normalizeValue(value) {
   return value === undefined || value === '' ? null : value;
@@ -84,7 +88,7 @@ router.get('/', async (req, res) => {
 
   const { rows } = await pool.query(
     `SELECT id, event_name, event_date, organizer, organizer_website, organizer_email,
-            application_text, venue_street, venue_zip, venue_city, fee,
+            application_text, venue_street, venue_zip, venue_city, fee, status,
             created_by, created_at, updated_by, updated_at
      FROM bookings
      ${whereSql}
@@ -101,12 +105,39 @@ router.get('/', async (req, res) => {
   });
 });
 
+const AUTOCOMPLETE_COLUMNS = [
+  'organizer',
+  'venue_city',
+  'venue_zip',
+  'venue_street',
+  'organizer_email',
+  'status',
+];
+
+router.get('/suggestions/:field', async (req, res) => {
+  const { field } = req.params;
+  const { q } = req.query;
+
+  if (!AUTOCOMPLETE_COLUMNS.includes(field)) {
+    return res.status(400).json({ error: 'Ungültiges Feld.' });
+  }
+
+  const { rows } = await pool.query(
+    `SELECT DISTINCT ${field} AS value FROM bookings
+     WHERE ${field} IS NOT NULL AND ${field} != '' ${q ? `AND ${field} ILIKE $1` : ''}
+     ORDER BY ${field} LIMIT 10`,
+    q ? [`%${q}%`] : [],
+  );
+
+  return res.status(200).json(rows.map((row) => row.value));
+});
+
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
   const { rows } = await pool.query(
     `SELECT id, event_name, event_date, organizer, organizer_website, organizer_email,
-            application_text, venue_street, venue_zip, venue_city, fee,
+            application_text, venue_street, venue_zip, venue_city, fee, status,
             created_by, created_at, updated_by, updated_at
      FROM bookings
      WHERE id = $1`,
@@ -127,7 +158,14 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'event_name ist erforderlich.' });
   }
 
-  const values = WRITABLE_FIELDS.map((field) => normalizeValue(req.body?.[field]));
+  if (req.body?.status && !STATUS_VALUES.includes(req.body.status)) {
+    return res.status(400).json({ error: 'Ungültiger Status.' });
+  }
+
+  const values = WRITABLE_FIELDS.map((field) => {
+    const value = normalizeValue(req.body?.[field]);
+    return field === 'status' ? value ?? 'offen' : value;
+  });
   const columns = ['created_by', ...WRITABLE_FIELDS];
   const placeholders = columns.map((_, index) => `$${index + 1}`);
 
@@ -135,7 +173,7 @@ router.post('/', async (req, res) => {
     `INSERT INTO bookings (${columns.join(', ')})
      VALUES (${placeholders.join(', ')})
      RETURNING id, event_name, event_date, organizer, organizer_website, organizer_email,
-               application_text, venue_street, venue_zip, venue_city, fee,
+               application_text, venue_street, venue_zip, venue_city, fee, status,
                created_by, created_at, updated_by, updated_at`,
     [req.user.username, ...values],
   );
@@ -151,8 +189,14 @@ router.put('/:id', async (req, res) => {
     return res.status(400).json({ error: 'event_name ist erforderlich.' });
   }
 
+  if (req.body?.status && !STATUS_VALUES.includes(req.body.status)) {
+    return res.status(400).json({ error: 'Ungültiger Status.' });
+  }
+
   const values = WRITABLE_FIELDS.map((field) => normalizeValue(req.body?.[field]));
-  const setClauses = WRITABLE_FIELDS.map((field, index) => `${field} = $${index + 1}`);
+  const setClauses = WRITABLE_FIELDS.map((field, index) =>
+    field === 'status' ? `status = COALESCE($${index + 1}, status)` : `${field} = $${index + 1}`,
+  );
   setClauses.push(`updated_by = $${values.length + 1}`);
   setClauses.push('updated_at = now()');
 
@@ -161,7 +205,7 @@ router.put('/:id', async (req, res) => {
      SET ${setClauses.join(', ')}
      WHERE id = $${values.length + 2}
      RETURNING id, event_name, event_date, organizer, organizer_website, organizer_email,
-               application_text, venue_street, venue_zip, venue_city, fee,
+               application_text, venue_street, venue_zip, venue_city, fee, status,
                created_by, created_at, updated_by, updated_at`,
     [...values, req.user.username, id],
   );

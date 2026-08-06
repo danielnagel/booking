@@ -40,6 +40,7 @@ const columns = [
     enableGrouping: false,
     cell: (info) => formatDate(info.getValue()),
   }),
+  columnHelper.accessor('status', { header: 'Status', enableGrouping: true }),
   columnHelper.accessor('created_by', {
     header: 'Ersteller',
     enableGrouping: true,

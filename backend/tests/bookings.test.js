@@ -1,4 +1,6 @@
 import { beforeEach, afterAll, describe, expect, it } from 'vitest';
+import request from 'supertest';
+import app from '../src/app.js';
 import { resetDb, closeDb, insertBooking } from './helpers/db.js';
 import { createAndLoginUser } from './helpers/auth.js';
 
@@ -65,6 +67,37 @@ describe('POST /api/bookings', () => {
     const response = await agent.post('/api/bookings').send({ event_name: '   ' });
 
     expect(response.status).toBe(400);
+  });
+
+  it('defaults status to offen when not set', async () => {
+    const { agent } = await createAndLoginUser('booker');
+
+    const response = await agent.post('/api/bookings').send({ event_name: 'Stadtfest' });
+
+    expect(response.status).toBe(201);
+    expect(response.body.status).toBe('offen');
+  });
+
+  it('accepts a valid status', async () => {
+    const { agent } = await createAndLoginUser('booker');
+
+    const response = await agent
+      .post('/api/bookings')
+      .send({ event_name: 'Stadtfest', status: 'angenommen' });
+
+    expect(response.status).toBe(201);
+    expect(response.body.status).toBe('angenommen');
+  });
+
+  it('rejects an invalid status', async () => {
+    const { agent } = await createAndLoginUser('booker');
+
+    const response = await agent
+      .post('/api/bookings')
+      .send({ event_name: 'Stadtfest', status: 'unbekannt' });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toMatch(/Status/);
   });
 });
 
@@ -227,6 +260,71 @@ describe('PUT /api/bookings/:id', () => {
 
     expect(response.status).toBe(200);
     expect(response.body.event_name).toBe('Bearbeitetes Fest');
+  });
+
+  it('accepts a valid status', async () => {
+    const { agent } = await createAndLoginUser('editor');
+    const booking = await insertBooking({ event_name: 'Altes Fest' });
+
+    const response = await agent
+      .put(`/api/bookings/${booking.id}`)
+      .send({ event_name: 'Altes Fest', status: 'abgelehnt' });
+
+    expect(response.status).toBe(200);
+    expect(response.body.status).toBe('abgelehnt');
+  });
+
+  it('rejects an invalid status', async () => {
+    const { agent } = await createAndLoginUser('editor');
+    const booking = await insertBooking({ event_name: 'Altes Fest' });
+
+    const response = await agent
+      .put(`/api/bookings/${booking.id}`)
+      .send({ event_name: 'Altes Fest', status: 'unbekannt' });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toMatch(/Status/);
+  });
+});
+
+describe('GET /api/bookings/suggestions/:field', () => {
+  it('returns distinct previously-used values for an allow-listed field', async () => {
+    const { agent } = await createAndLoginUser('booker');
+    await insertBooking({ event_name: 'Erstes Fest', organizer: 'Musterstadt e.V.' });
+    await insertBooking({ event_name: 'Zweites Fest', organizer: 'Musterstadt e.V.' });
+    await insertBooking({ event_name: 'Drittes Fest', organizer: 'Kulturverein' });
+
+    const response = await agent.get('/api/bookings/suggestions/organizer');
+
+    expect(response.status).toBe(200);
+    expect(response.body.sort()).toEqual(['Kulturverein', 'Musterstadt e.V.']);
+  });
+
+  it('filters suggestions using the q query parameter', async () => {
+    const { agent } = await createAndLoginUser('booker');
+    await insertBooking({ event_name: 'Erstes Fest', organizer: 'Musterstadt e.V.' });
+    await insertBooking({ event_name: 'Zweites Fest', organizer: 'Kulturverein' });
+
+    const response = await agent
+      .get('/api/bookings/suggestions/organizer')
+      .query({ q: 'Muster' });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(['Musterstadt e.V.']);
+  });
+
+  it('rejects a field that is not in the allow-list', async () => {
+    const { agent } = await createAndLoginUser('booker');
+
+    const response = await agent.get('/api/bookings/suggestions/not_a_real_column');
+
+    expect(response.status).toBe(400);
+  });
+
+  it('rejects requests without a session', async () => {
+    const response = await request(app).get('/api/bookings/suggestions/organizer');
+
+    expect(response.status).toBe(401);
   });
 });
 

@@ -53,9 +53,19 @@ onMounted(loadEntry);
 
 <template>
   <main class="flex flex-col gap-6 px-4 py-8 max-w-2xl mx-auto w-full">
-    <h1 class="text-2xl font-semibold">
-      {{ isEditMode ? 'Eintrag bearbeiten' : 'Neuer Eintrag' }}
-    </h1>
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-semibold">
+        {{ isEditMode ? 'Eintrag bearbeiten' : 'Neuer Eintrag' }}
+      </h1>
+      <button
+        type="button"
+        class="flex items-center justify-center h-9 w-9 rounded-full border border-primary/30 text-lg leading-none hover:bg-primary/10"
+        aria-label="Abbrechen"
+        @click="router.push('/')"
+      >
+        &times;
+      </button>
+    </div>
 
     <p
       v-if="errorMessage"

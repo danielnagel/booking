@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, watch } from 'vue';
 
+import { apiClient } from '../api/client';
 import FormField from './FormField.vue';
 
 const props = defineProps({
@@ -9,6 +10,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['submit']);
+
+const STATUS_OPTIONS = ['offen', 'angenommen', 'abgelehnt', 'storniert'];
 
 function emptyForm() {
   return {
@@ -22,10 +25,38 @@ function emptyForm() {
     venue_zip: '',
     venue_city: '',
     fee: '',
+    status: 'offen',
   };
 }
 
 const form = reactive({ ...emptyForm(), ...props.initialData });
+
+const suggestions = reactive({
+  organizer: [],
+  venue_street: [],
+  venue_zip: [],
+  venue_city: [],
+  organizer_email: [],
+});
+
+const suggestionDebounceHandles = {};
+function fetchSuggestions(field, value) {
+  clearTimeout(suggestionDebounceHandles[field]);
+  suggestionDebounceHandles[field] = setTimeout(async () => {
+    try {
+      suggestions[field] = await apiClient.get(`/bookings/suggestions/${field}`, { q: value });
+    } catch {
+      suggestions[field] = [];
+    }
+  }, 300);
+}
+
+for (const field of Object.keys(suggestions)) {
+  watch(
+    () => form[field],
+    (value) => fetchSuggestions(field, value),
+  );
+}
 
 watch(
   () => props.initialData,
@@ -63,9 +94,17 @@ function handleSubmit(andContinue) {
       type="date"
     />
     <FormField
+      id="status"
+      v-model="form.status"
+      label="Status"
+      type="select"
+      :options="STATUS_OPTIONS"
+    />
+    <FormField
       id="organizer"
       v-model="form.organizer"
       label="Veranstalter"
+      :suggestions="suggestions.organizer"
     />
     <FormField
       id="organizer_website"
@@ -78,6 +117,7 @@ function handleSubmit(andContinue) {
       v-model="form.organizer_email"
       label="Veranstalter-E-Mail"
       type="email"
+      :suggestions="suggestions.organizer_email"
     />
     <FormField
       id="application_text"
@@ -89,16 +129,19 @@ function handleSubmit(andContinue) {
       id="venue_street"
       v-model="form.venue_street"
       label="Straße"
+      :suggestions="suggestions.venue_street"
     />
     <FormField
       id="venue_zip"
       v-model="form.venue_zip"
       label="PLZ"
+      :suggestions="suggestions.venue_zip"
     />
     <FormField
       id="venue_city"
       v-model="form.venue_city"
       label="Ort"
+      :suggestions="suggestions.venue_city"
     />
     <FormField
       id="fee"

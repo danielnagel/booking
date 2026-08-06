@@ -47,6 +47,13 @@ Werden aus `.env` gelesen (siehe `.env.example` am Repo-Root; lokal per
 - `PORT` – Port, auf dem die Express-App lauscht (Default `3000`).
 - `NODE_ENV` – wird auf `production` gesetzt, damit das Auth-Cookie zusätzlich
   `Secure` ist (setzt TLS-Terminierung davor voraus, siehe Meilenstein 2).
+- `TRUST_PROXY_HOPS` – Anzahl der Reverse-Proxy-Hops vor diesem Service
+  (Default `0` = direkte Verbindung, kein Proxy). Muss exakt der echten
+  Hop-Zahl der jeweiligen Umgebung entsprechen, siehe Kommentar in
+  `src/app.js` (falsch gesetzt bricht entweder `authRateLimiter`s
+  Pro-IP-Zählung oder – falls zu großzügig – lässt sich per gefälschtem
+  `X-Forwarded-For` umgehen). Das lokale `docker-compose.yml` setzt dafür
+  bereits `1` (ein `frontend`-nginx-Hop).
 
 ## Migrationen
 

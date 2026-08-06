@@ -46,6 +46,10 @@ services:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
       PORT: 3000
+      # Exactly one reverse-proxy hop sits in front of "backend" here: the
+      # "frontend" nginx container (see frontend/nginx.conf). See app.js for
+      # why this must match the real hop count exactly.
+      TRUST_PROXY_HOPS: 1
       # NODE_ENV is intentionally left unset (not "production") here: the
       # backend marks its auth cookie Secure when NODE_ENV=production
       # (backend/src/routes/auth.js), which browsers refuse to store over

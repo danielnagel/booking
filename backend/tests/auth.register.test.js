@@ -2,7 +2,7 @@ import { beforeEach, afterAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import app from '../src/app.js';
 import { resetDb, closeDb, insertInviteCode } from './helpers/db.js';
-import { PASSWORD_POLICY_MESSAGE } from '../src/lib/passwordPolicy.js';
+import { PASSWORD_POLICY_ERROR_CODE } from '../src/lib/passwordPolicy.js';
 
 beforeEach(async () => {
   await resetDb();
@@ -30,7 +30,7 @@ describe('POST /api/auth/register', () => {
     });
 
     expect(response.status).toBe(400);
-    expect(response.body.error).toBe(PASSWORD_POLICY_MESSAGE);
+    expect(response.body.error).toBe(PASSWORD_POLICY_ERROR_CODE);
   });
 
   it('rejects an invite code that does not exist', async () => {
@@ -41,7 +41,7 @@ describe('POST /api/auth/register', () => {
     });
 
     expect(response.status).toBe(400);
-    expect(response.body.error).toMatch(/Invite-Code/);
+    expect(response.body.error).toBe('invite_code_invalid');
   });
 
   it('rejects an expired invite code', async () => {
@@ -56,7 +56,7 @@ describe('POST /api/auth/register', () => {
     });
 
     expect(response.status).toBe(400);
-    expect(response.body.error).toMatch(/Invite-Code/);
+    expect(response.body.error).toBe('invite_code_invalid');
   });
 
   it('rejects a revoked invite code', async () => {
@@ -71,7 +71,7 @@ describe('POST /api/auth/register', () => {
     });
 
     expect(response.status).toBe(400);
-    expect(response.body.error).toMatch(/Invite-Code/);
+    expect(response.body.error).toBe('invite_code_invalid');
   });
 
   it('registers a user with a valid invite code', async () => {
@@ -121,6 +121,6 @@ describe('POST /api/auth/register', () => {
 
     expect(first.status).toBe(201);
     expect(second.status).toBe(409);
-    expect(second.body.error).toMatch(/Username/);
+    expect(second.body.error).toBe('username_taken');
   });
 });

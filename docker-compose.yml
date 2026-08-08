@@ -68,6 +68,12 @@ services:
       context: .
       dockerfile: frontend/Dockerfile
     restart: unless-stopped
+    environment:
+      # Initial UI language before a user picks one via the language switch
+      # (persisted in their browser after that). Applied at container start
+      # by frontend/docker-entrypoint.d/40-locale-config.sh, since this is a
+      # prebuilt static SPA and can't read process.env at runtime otherwise.
+      DEFAULT_LOCALE: ${DEFAULT_LOCALE:-en}
     depends_on:
       - backend
     ports:

@@ -45,9 +45,9 @@ describe('LoginView', () => {
 
     render(LoginView, { global: { plugins: [router] } });
 
-    await fireEvent.update(screen.getByLabelText(/^Benutzername/), 'anna');
-    await fireEvent.update(screen.getByLabelText(/^Passwort/), 'secret');
-    await fireEvent.click(screen.getByRole('button', { name: 'Anmelden' }));
+    await fireEvent.update(screen.getByLabelText(/^Username/), 'anna');
+    await fireEvent.update(screen.getByLabelText(/^Password/), 'secret');
+    await fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
 
     await waitFor(() => expect(router.currentRoute.value.path).toBe('/'));
     expect(apiClient.post).toHaveBeenCalledWith('/auth/login', { username: 'anna', password: 'secret' });
@@ -60,9 +60,9 @@ describe('LoginView', () => {
 
     render(LoginView, { global: { plugins: [router] } });
 
-    await fireEvent.update(screen.getByLabelText(/^Benutzername/), 'anna');
-    await fireEvent.update(screen.getByLabelText(/^Passwort/), 'secret');
-    await fireEvent.click(screen.getByRole('button', { name: 'Anmelden' }));
+    await fireEvent.update(screen.getByLabelText(/^Username/), 'anna');
+    await fireEvent.update(screen.getByLabelText(/^Password/), 'secret');
+    await fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
 
     await waitFor(() => expect(router.currentRoute.value.path).toBe('/eingabe'));
   });
@@ -74,11 +74,11 @@ describe('LoginView', () => {
 
     render(LoginView, { global: { plugins: [router] } });
 
-    await fireEvent.update(screen.getByLabelText(/^Benutzername/), 'anna');
-    await fireEvent.update(screen.getByLabelText(/^Passwort/), 'wrong');
-    await fireEvent.click(screen.getByRole('button', { name: 'Anmelden' }));
+    await fireEvent.update(screen.getByLabelText(/^Username/), 'anna');
+    await fireEvent.update(screen.getByLabelText(/^Password/), 'wrong');
+    await fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
 
-    expect(await screen.findByText('Anmeldung fehlgeschlagen. Bitte Zugangsdaten prüfen.')).toBeInTheDocument();
+    expect(await screen.findByText('Login failed. Please check your credentials.')).toBeInTheDocument();
     expect(router.currentRoute.value.path).toBe('/login');
   });
 
@@ -88,7 +88,7 @@ describe('LoginView', () => {
 
     render(LoginView, { global: { plugins: [router] } });
 
-    expect(screen.getByRole('link', { name: /Registrieren/ })).toHaveAttribute('href', '/registrieren');
-    expect(screen.getByRole('link', { name: /Passwort vergessen/ })).toHaveAttribute('href', '/passwort-zuruecksetzen');
+    expect(screen.getByRole('link', { name: /Register/ })).toHaveAttribute('href', '/registrieren');
+    expect(screen.getByRole('link', { name: /Forgot your password/ })).toHaveAttribute('href', '/passwort-zuruecksetzen');
   });
 });

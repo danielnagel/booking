@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import pool from '../db/pool.js';
 import { requireAuth } from '../middleware/auth.js';
 import { authRateLimiter } from '../middleware/rateLimit.js';
-import { isPasswordValid, PASSWORD_POLICY_MESSAGE } from '../lib/passwordPolicy.js';
+import { isPasswordValid, PASSWORD_POLICY_ERROR_CODE } from '../lib/passwordPolicy.js';
 
 const router = Router();
 
@@ -20,13 +20,11 @@ router.post('/register', authRateLimiter, async (req, res) => {
   const { inviteCode, username, password } = req.body ?? {};
 
   if (!inviteCode || !username || !password) {
-    return res
-      .status(400)
-      .json({ error: 'inviteCode, username und password sind erforderlich.' });
+    return res.status(400).json({ error: 'missing_fields' });
   }
 
   if (!isPasswordValid(password)) {
-    return res.status(400).json({ error: PASSWORD_POLICY_MESSAGE });
+    return res.status(400).json({ error: PASSWORD_POLICY_ERROR_CODE });
   }
 
   const { rows: inviteRows } = await pool.query(
@@ -36,9 +34,7 @@ router.post('/register', authRateLimiter, async (req, res) => {
   );
 
   if (inviteRows.length === 0) {
-    return res
-      .status(400)
-      .json({ error: 'Invite-Code ist ungueltig, abgelaufen oder deaktiviert.' });
+    return res.status(400).json({ error: 'invite_code_invalid' });
   }
 
   const { rows: existingUsers } = await pool.query(
@@ -47,7 +43,7 @@ router.post('/register', authRateLimiter, async (req, res) => {
   );
 
   if (existingUsers.length > 0) {
-    return res.status(409).json({ error: 'Username ist bereits vergeben.' });
+    return res.status(409).json({ error: 'username_taken' });
   }
 
   const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
@@ -64,13 +60,11 @@ router.post('/reset-password', authRateLimiter, async (req, res) => {
   const { resetCode, newPassword } = req.body ?? {};
 
   if (!resetCode || !newPassword) {
-    return res
-      .status(400)
-      .json({ error: 'resetCode und newPassword sind erforderlich.' });
+    return res.status(400).json({ error: 'missing_fields' });
   }
 
   if (!isPasswordValid(newPassword)) {
-    return res.status(400).json({ error: PASSWORD_POLICY_MESSAGE });
+    return res.status(400).json({ error: PASSWORD_POLICY_ERROR_CODE });
   }
 
   const { rows } = await pool.query(
@@ -80,9 +74,7 @@ router.post('/reset-password', authRateLimiter, async (req, res) => {
   );
 
   if (rows.length === 0) {
-    return res
-      .status(400)
-      .json({ error: 'Reset-Code ist ungueltig, abgelaufen oder bereits verwendet.' });
+    return res.status(400).json({ error: 'reset_code_invalid' });
   }
 
   const { user_id: userId } = rows[0];
@@ -104,9 +96,7 @@ router.post('/login', authRateLimiter, async (req, res) => {
   const { username, password } = req.body ?? {};
 
   if (!username || !password) {
-    return res
-      .status(400)
-      .json({ error: 'username und password sind erforderlich.' });
+    return res.status(400).json({ error: 'missing_fields' });
   }
 
   const { rows } = await pool.query(
@@ -121,7 +111,7 @@ router.post('/login', authRateLimiter, async (req, res) => {
   );
 
   if (!user || !passwordMatches) {
-    return res.status(401).json({ error: 'Username oder Passwort falsch.' });
+    return res.status(401).json({ error: 'invalid_credentials' });
   }
 
   await pool.query('UPDATE users SET last_login_at = now() WHERE id = $1', [user.id]);

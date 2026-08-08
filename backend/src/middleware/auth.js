@@ -5,14 +5,14 @@ export async function requireAuth(req, res, next) {
   const token = req.cookies?.token;
 
   if (!token) {
-    return res.status(401).json({ error: 'Nicht angemeldet.' });
+    return res.status(401).json({ error: 'not_authenticated' });
   }
 
   let payload;
   try {
     payload = jwt.verify(token, process.env.JWT_SECRET);
   } catch {
-    return res.status(401).json({ error: 'Session ungueltig oder abgelaufen.' });
+    return res.status(401).json({ error: 'session_expired' });
   }
 
   // A JWT stays valid for its full lifetime (12h) regardless of what happens
@@ -20,7 +20,7 @@ export async function requireAuth(req, res, next) {
   // using a still-valid cookie until it expires.
   const { rows } = await pool.query('SELECT id FROM users WHERE id = $1', [payload.sub]);
   if (rows.length === 0) {
-    return res.status(401).json({ error: 'Session ungueltig oder abgelaufen.' });
+    return res.status(401).json({ error: 'session_expired' });
   }
 
   req.user = { id: payload.sub, username: payload.username };

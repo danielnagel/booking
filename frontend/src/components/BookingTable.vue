@@ -1,5 +1,6 @@
 <script setup>
-import { h, ref, watch } from 'vue';
+import { computed, h, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import {
   FlexRender,
   createColumnHelper,
@@ -8,6 +9,8 @@ import {
   getGroupedRowModel,
   useVueTable,
 } from '@tanstack/vue-table';
+
+import { useStatusLabel } from '../constants/bookingStatus';
 
 const props = defineProps({
   rows: { type: Array, default: () => [] },
@@ -21,58 +24,82 @@ const props = defineProps({
 
 const emit = defineEmits(['search-change', 'sort-change', 'page-change', 'edit', 'delete']);
 
+const { t, locale } = useI18n();
+const statusLabel = useStatusLabel();
+
+const intlLocale = computed(() => (locale.value === 'de' ? 'de-DE' : 'en-GB'));
+
 function formatFee(value) {
   if (value === null || value === undefined || value === '') return '';
-  return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value);
+  return new Intl.NumberFormat(intlLocale.value, { style: 'currency', currency: 'EUR' }).format(value);
 }
 
 function formatDate(value) {
   if (!value) return '';
-  return new Intl.DateTimeFormat('de-DE').format(new Date(value));
+  return new Intl.DateTimeFormat(intlLocale.value).format(new Date(value));
 }
 
 const columnHelper = createColumnHelper();
 
 const columns = [
-  columnHelper.accessor('event_name', { header: 'Veranstaltung', enableGrouping: false }),
+  columnHelper.accessor('event_name', {
+    header: () => t('bookingTable.columns.eventName'),
+    enableGrouping: false,
+  }),
   columnHelper.accessor('event_date', {
-    header: 'Datum',
+    header: () => t('bookingTable.columns.date'),
     enableGrouping: false,
     cell: (info) => formatDate(info.getValue()),
   }),
-  columnHelper.accessor('status', { header: 'Status', enableGrouping: true }),
+  columnHelper.accessor('status', {
+    header: () => t('bookingTable.columns.status'),
+    enableGrouping: true,
+    cell: (info) => statusLabel(info.getValue()),
+  }),
   columnHelper.accessor('created_by', {
-    header: 'Ersteller',
+    header: () => t('bookingTable.columns.createdBy'),
     enableGrouping: true,
     enableSorting: false,
   }),
-  columnHelper.accessor('organizer', { header: 'Veranstalter', enableGrouping: true }),
+  columnHelper.accessor('organizer', {
+    header: () => t('bookingTable.columns.organizer'),
+    enableGrouping: true,
+  }),
   columnHelper.accessor('organizer_website', {
-    header: 'Website',
+    header: () => t('bookingTable.columns.website'),
     enableGrouping: false,
     enableSorting: false,
   }),
   columnHelper.accessor('organizer_email', {
-    header: 'E-Mail',
+    header: () => t('bookingTable.columns.email'),
     enableGrouping: false,
     enableSorting: false,
   }),
   columnHelper.accessor('application_text', {
-    header: 'Bewerbungstext',
+    header: () => t('bookingTable.columns.applicationText'),
     enableGrouping: false,
     enableSorting: false,
   }),
-  columnHelper.accessor('venue_street', { header: 'Straße', enableGrouping: false }),
-  columnHelper.accessor('venue_zip', { header: 'PLZ', enableGrouping: true }),
-  columnHelper.accessor('venue_city', { header: 'Ort', enableGrouping: true }),
+  columnHelper.accessor('venue_street', {
+    header: () => t('bookingTable.columns.street'),
+    enableGrouping: false,
+  }),
+  columnHelper.accessor('venue_zip', {
+    header: () => t('bookingTable.columns.zip'),
+    enableGrouping: true,
+  }),
+  columnHelper.accessor('venue_city', {
+    header: () => t('bookingTable.columns.city'),
+    enableGrouping: true,
+  }),
   columnHelper.accessor('fee', {
-    header: 'Gage (€)',
+    header: () => t('bookingTable.columns.fee'),
     enableGrouping: false,
     cell: (info) => formatFee(info.getValue()),
   }),
   columnHelper.display({
     id: 'actions',
-    header: 'Aktionen',
+    header: () => t('bookingTable.columns.actions'),
     enableSorting: false,
     enableGrouping: false,
     cell: (info) =>
@@ -84,7 +111,7 @@ const columns = [
             class: 'underline text-sm',
             onClick: () => emit('edit', info.row.original.id),
           },
-          'Bearbeiten',
+          t('bookingTable.edit'),
         ),
         h(
           'button',
@@ -93,7 +120,7 @@ const columns = [
             class: 'underline text-sm text-red-600',
             onClick: () => emit('delete', info.row.original.id),
           },
-          'Löschen',
+          t('bookingTable.delete'),
         ),
       ]),
   }),
@@ -171,7 +198,7 @@ function goToPage(page) {
     <input
       v-model="localSearch"
       type="search"
-      placeholder="Suche..."
+      :placeholder="t('bookingTable.search')"
       class="bg-secondary text-primary border border-primary rounded px-3 py-2 max-w-sm"
     >
 
@@ -208,7 +235,7 @@ function goToPage(page) {
                   class="text-xs underline text-accent"
                   @click="header.column.getToggleGroupingHandler()()"
                 >
-                  {{ header.column.getIsGrouped() ? 'Gruppierung aufheben' : 'Gruppieren' }}
+                  {{ header.column.getIsGrouped() ? t('bookingTable.ungroup') : t('bookingTable.group') }}
                 </button>
               </div>
             </th>
@@ -250,7 +277,7 @@ function goToPage(page) {
               :colspan="columns.length"
               class="px-3 py-6 text-center text-primary/60"
             >
-              Keine Einträge gefunden.
+              {{ t('bookingTable.empty') }}
             </td>
           </tr>
         </tbody>
@@ -258,7 +285,7 @@ function goToPage(page) {
     </div>
 
     <div class="flex items-center justify-between">
-      <span class="text-sm text-primary/70">{{ totalCount }} Einträge insgesamt</span>
+      <span class="text-sm text-primary/70">{{ t('bookingTable.totalEntries', { count: totalCount }) }}</span>
       <div class="flex items-center gap-3">
         <button
           type="button"
@@ -266,16 +293,16 @@ function goToPage(page) {
           :disabled="page <= 1"
           @click="goToPage(page - 1)"
         >
-          Zurück
+          {{ t('bookingTable.back') }}
         </button>
-        <span class="text-sm">Seite {{ page }} von {{ pageCount || 1 }}</span>
+        <span class="text-sm">{{ t('bookingTable.pageOf', { page, pageCount: pageCount || 1 }) }}</span>
         <button
           type="button"
           class="px-3 py-1 rounded border border-primary/30 disabled:opacity-40"
           :disabled="page >= pageCount"
           @click="goToPage(page + 1)"
         >
-          Weiter
+          {{ t('bookingTable.next') }}
         </button>
       </div>
     </div>

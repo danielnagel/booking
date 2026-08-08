@@ -1,0 +1,116 @@
+{
+  "app": {
+    "logout": "Abmelden"
+  },
+  "login": {
+    "title": "Login",
+    "username": "Benutzername",
+    "password": "Passwort",
+    "submit": "Anmelden",
+    "noAccount": "Noch keinen Account? Registrieren",
+    "forgotPassword": "Passwort vergessen?",
+    "error": "Anmeldung fehlgeschlagen. Bitte Zugangsdaten prüfen."
+  },
+  "register": {
+    "title": "Registrieren",
+    "inviteCode": "Invite-Code",
+    "username": "Benutzername",
+    "password": "Passwort",
+    "submit": "Registrieren",
+    "backToLogin": "Zurück zum Login"
+  },
+  "resetPassword": {
+    "title": "Passwort zurücksetzen",
+    "resetCode": "Reset-Code",
+    "newPassword": "Neues Passwort",
+    "submit": "Passwort zurücksetzen",
+    "backToLogin": "Zurück zum Login"
+  },
+  "overview": {
+    "title": "Übersicht",
+    "newEntry": "Neuer Eintrag",
+    "loading": "Lädt...",
+    "loadError": "Einträge konnten nicht geladen werden.",
+    "deleteError": "Eintrag konnte nicht gelöscht werden.",
+    "confirmDeleteTitle": "Löschen bestätigen",
+    "confirmDeleteMessage": "Soll dieser Eintrag wirklich gelöscht werden?"
+  },
+  "entryForm": {
+    "editTitle": "Eintrag bearbeiten",
+    "newTitle": "Neuer Eintrag",
+    "cancel": "Abbrechen",
+    "loading": "Lädt...",
+    "loadError": "Eintrag konnte nicht geladen werden.",
+    "saveError": "Eintrag konnte nicht gespeichert werden."
+  },
+  "bookingForm": {
+    "eventName": "Veranstaltungsname",
+    "eventDate": "Datum",
+    "status": "Status",
+    "organizer": "Veranstalter",
+    "organizerWebsite": "Veranstalter-Website",
+    "organizerEmail": "Veranstalter-E-Mail",
+    "applicationText": "Bewerbungstext",
+    "venueStreet": "Straße",
+    "venueZip": "PLZ",
+    "venueCity": "Ort",
+    "fee": "Gage (€)",
+    "saveAndNext": "Speichern und nächster Eintrag",
+    "addAndNext": "Hinzufügen und nächster Eintrag",
+    "saveAndBack": "Speichern und zurück zur Übersicht",
+    "addAndBack": "Hinzufügen und zurück zur Übersicht",
+    "status_offen": "Offen",
+    "status_angenommen": "Angenommen",
+    "status_abgelehnt": "Abgelehnt",
+    "status_storniert": "Storniert"
+  },
+  "bookingTable": {
+    "search": "Suche...",
+    "columns": {
+      "eventName": "Veranstaltung",
+      "date": "Datum",
+      "status": "Status",
+      "createdBy": "Ersteller",
+      "organizer": "Veranstalter",
+      "website": "Website",
+      "email": "E-Mail",
+      "applicationText": "Bewerbungstext",
+      "street": "Straße",
+      "zip": "PLZ",
+      "city": "Ort",
+      "fee": "Gage (€)",
+      "actions": "Aktionen"
+    },
+    "group": "Gruppieren",
+    "ungroup": "Gruppierung aufheben",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "empty": "Keine Einträge gefunden.",
+    "back": "Zurück",
+    "next": "Weiter",
+    "pageOf": "Seite {page} von {pageCount}",
+    "totalEntries": "{count} Einträge insgesamt"
+  },
+  "confirmDialog": {
+    "title": "Löschen bestätigen",
+    "message": "Soll dieser Eintrag wirklich gelöscht werden?",
+    "cancel": "Abbrechen",
+    "delete": "Löschen"
+  },
+  "errors": {
+    "missing_fields": "Bitte alle erforderlichen Felder ausfüllen.",
+    "invalid_password_policy": "Passwort muss mindestens 12 Zeichen sowie Groß-/Kleinschreibung, eine Zahl und ein Sonderzeichen enthalten.",
+    "invite_code_invalid": "Invite-Code ist ungültig, abgelaufen oder deaktiviert.",
+    "username_taken": "Username ist bereits vergeben.",
+    "invalid_credentials": "Username oder Passwort falsch.",
+    "reset_code_invalid": "Reset-Code ist ungültig, abgelaufen oder bereits verwendet.",
+    "not_authenticated": "Nicht angemeldet.",
+    "session_expired": "Session ungültig oder abgelaufen.",
+    "rate_limited": "Zu viele Versuche. Bitte später erneut versuchen.",
+    "invalid_field": "Ungültiges Feld.",
+    "booking_not_found": "Eintrag nicht gefunden.",
+    "event_name_required": "Veranstaltungsname ist erforderlich.",
+    "invalid_status": "Ungültiger Status.",
+    "unknown_error": "Ein unbekannter Fehler ist aufgetreten."
+  }
+}

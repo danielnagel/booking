@@ -9,7 +9,7 @@ export const authRateLimiter = rateLimit({
   limit: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'Zu viele Versuche. Bitte später erneut versuchen.' },
+  message: { error: 'rate_limited' },
   // Vitest sets NODE_ENV=test by default (like Jest/Vite), and the existing
   // register/login/reset-password tests call their endpoint more than 10
   // times per test file, so without this skip they would immediately fail

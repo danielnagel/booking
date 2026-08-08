@@ -1,0 +1,116 @@
+{
+  "app": {
+    "logout": "Logout"
+  },
+  "login": {
+    "title": "Login",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Log in",
+    "noAccount": "Don't have an account yet? Register",
+    "forgotPassword": "Forgot your password?",
+    "error": "Login failed. Please check your credentials."
+  },
+  "register": {
+    "title": "Register",
+    "inviteCode": "Invite code",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Register",
+    "backToLogin": "Back to login"
+  },
+  "resetPassword": {
+    "title": "Reset password",
+    "resetCode": "Reset code",
+    "newPassword": "New password",
+    "submit": "Reset password",
+    "backToLogin": "Back to login"
+  },
+  "overview": {
+    "title": "Overview",
+    "newEntry": "New entry",
+    "loading": "Loading...",
+    "loadError": "Entries could not be loaded.",
+    "deleteError": "Entry could not be deleted.",
+    "confirmDeleteTitle": "Confirm deletion",
+    "confirmDeleteMessage": "Do you really want to delete this entry?"
+  },
+  "entryForm": {
+    "editTitle": "Edit entry",
+    "newTitle": "New entry",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "loadError": "Entry could not be loaded.",
+    "saveError": "Entry could not be saved."
+  },
+  "bookingForm": {
+    "eventName": "Event name",
+    "eventDate": "Date",
+    "status": "Status",
+    "organizer": "Organizer",
+    "organizerWebsite": "Organizer website",
+    "organizerEmail": "Organizer email",
+    "applicationText": "Application text",
+    "venueStreet": "Street",
+    "venueZip": "ZIP code",
+    "venueCity": "City",
+    "fee": "Fee (€)",
+    "saveAndNext": "Save and next entry",
+    "addAndNext": "Add and next entry",
+    "saveAndBack": "Save and back to overview",
+    "addAndBack": "Add and back to overview",
+    "status_offen": "Open",
+    "status_angenommen": "Accepted",
+    "status_abgelehnt": "Rejected",
+    "status_storniert": "Cancelled"
+  },
+  "bookingTable": {
+    "search": "Search...",
+    "columns": {
+      "eventName": "Event",
+      "date": "Date",
+      "status": "Status",
+      "createdBy": "Created by",
+      "organizer": "Organizer",
+      "website": "Website",
+      "email": "Email",
+      "applicationText": "Application text",
+      "street": "Street",
+      "zip": "ZIP",
+      "city": "City",
+      "fee": "Fee (€)",
+      "actions": "Actions"
+    },
+    "group": "Group",
+    "ungroup": "Ungroup",
+    "edit": "Edit",
+    "delete": "Delete",
+    "empty": "No entries found.",
+    "back": "Back",
+    "next": "Next",
+    "pageOf": "Page {page} of {pageCount}",
+    "totalEntries": "{count} entries total"
+  },
+  "confirmDialog": {
+    "title": "Confirm deletion",
+    "message": "Do you really want to delete this entry?",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "errors": {
+    "missing_fields": "Please fill in all required fields.",
+    "invalid_password_policy": "Password must be at least 12 characters long and include upper/lowercase letters, a number, and a special character.",
+    "invite_code_invalid": "Invite code is invalid, expired, or deactivated.",
+    "username_taken": "Username is already taken.",
+    "invalid_credentials": "Username or password is incorrect.",
+    "reset_code_invalid": "Reset code is invalid, expired, or already used.",
+    "not_authenticated": "Not logged in.",
+    "session_expired": "Session invalid or expired.",
+    "rate_limited": "Too many attempts. Please try again later.",
+    "invalid_field": "Invalid field.",
+    "booking_not_found": "Entry not found.",
+    "event_name_required": "Event name is required.",
+    "invalid_status": "Invalid status.",
+    "unknown_error": "An unknown error occurred."
+  }
+}

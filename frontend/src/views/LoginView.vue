@@ -1,10 +1,12 @@
 <script setup>
 import { reactive, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 
 import { useAuthStore } from '../stores/auth';
 import FormField from '../components/FormField.vue';
 
+const { t } = useI18n();
 const authStore = useAuthStore();
 const router = useRouter();
 const route = useRoute();
@@ -25,7 +27,7 @@ async function handleSubmit() {
     const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/';
     router.push(redirect);
   } catch {
-    errorMessage.value = 'Anmeldung fehlgeschlagen. Bitte Zugangsdaten prüfen.';
+    errorMessage.value = t('login.error');
   } finally {
     isSubmitting.value = false;
   }
@@ -35,7 +37,7 @@ async function handleSubmit() {
 <template>
   <main class="flex flex-col items-center px-4 py-10">
     <h1 class="text-2xl font-semibold mb-6">
-      Login
+      {{ t('login.title') }}
     </h1>
 
     <form
@@ -45,14 +47,14 @@ async function handleSubmit() {
       <FormField
         id="username"
         v-model="form.username"
-        label="Benutzername"
+        :label="t('login.username')"
         type="text"
         required
       />
       <FormField
         id="password"
         v-model="form.password"
-        label="Passwort"
+        :label="t('login.password')"
         type="password"
         required
       />
@@ -69,7 +71,7 @@ async function handleSubmit() {
         class="bg-primary text-secondary rounded px-4 py-2 disabled:opacity-50"
         :disabled="isSubmitting"
       >
-        Anmelden
+        {{ t('login.submit') }}
       </button>
     </form>
 
@@ -78,13 +80,13 @@ async function handleSubmit() {
         to="/registrieren"
         class="underline"
       >
-        Noch keinen Account? Registrieren
+        {{ t('login.noAccount') }}
       </router-link>
       <router-link
         to="/passwort-zuruecksetzen"
         class="underline"
       >
-        Passwort vergessen?
+        {{ t('login.forgotPassword') }}
       </router-link>
     </div>
   </main>

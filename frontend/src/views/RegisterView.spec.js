@@ -41,10 +41,10 @@ describe('RegisterView', () => {
 
     render(RegisterView, { global: { plugins: [router] } });
 
-    await fireEvent.update(screen.getByLabelText(/^Invite-Code/), 'BAND-2026');
-    await fireEvent.update(screen.getByLabelText(/^Benutzername/), 'anna');
-    await fireEvent.update(screen.getByLabelText(/^Passwort/), 'secret123');
-    await fireEvent.click(screen.getByRole('button', { name: 'Registrieren' }));
+    await fireEvent.update(screen.getByLabelText(/^Invite code/), 'BAND-2026');
+    await fireEvent.update(screen.getByLabelText(/^Username/), 'anna');
+    await fireEvent.update(screen.getByLabelText(/^Password/), 'secret123');
+    await fireEvent.click(screen.getByRole('button', { name: 'Register' }));
 
     expect(apiClient.post).toHaveBeenCalledWith('/auth/register', {
       inviteCode: 'BAND-2026',
@@ -55,18 +55,20 @@ describe('RegisterView', () => {
   });
 
   it('shows an error message when registration fails', async () => {
-    apiClient.post.mockRejectedValueOnce(new Error('invalid invite code'));
+    apiClient.post.mockRejectedValueOnce(new Error('invite_code_invalid'));
     const router = createTestRouter();
     await router.isReady();
 
     render(RegisterView, { global: { plugins: [router] } });
 
-    await fireEvent.update(screen.getByLabelText(/^Invite-Code/), 'EXPIRED');
-    await fireEvent.update(screen.getByLabelText(/^Benutzername/), 'anna');
-    await fireEvent.update(screen.getByLabelText(/^Passwort/), 'secret123');
-    await fireEvent.click(screen.getByRole('button', { name: 'Registrieren' }));
+    await fireEvent.update(screen.getByLabelText(/^Invite code/), 'EXPIRED');
+    await fireEvent.update(screen.getByLabelText(/^Username/), 'anna');
+    await fireEvent.update(screen.getByLabelText(/^Password/), 'secret123');
+    await fireEvent.click(screen.getByRole('button', { name: 'Register' }));
 
-    expect(await screen.findByText('invalid invite code')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Invite code is invalid, expired, or deactivated.'),
+    ).toBeInTheDocument();
     expect(router.currentRoute.value.path).toBe('/registrieren');
   });
 
@@ -76,6 +78,6 @@ describe('RegisterView', () => {
 
     render(RegisterView, { global: { plugins: [router] } });
 
-    expect(screen.getByRole('link', { name: /Zurück zum Login/ })).toHaveAttribute('href', '/login');
+    expect(screen.getByRole('link', { name: /Back to login/ })).toHaveAttribute('href', '/login');
   });
 });

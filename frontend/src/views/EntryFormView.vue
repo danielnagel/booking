@@ -1,10 +1,12 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 
 import { apiClient } from '../api/client';
 import BookingForm from '../components/BookingForm.vue';
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 
@@ -23,7 +25,7 @@ async function loadEntry() {
     const data = await apiClient.get(`/bookings/${id.value}`);
     initialData.value = data ?? {};
   } catch {
-    errorMessage.value = 'Eintrag konnte nicht geladen werden.';
+    errorMessage.value = t('entryForm.loadError');
   } finally {
     isLoading.value = false;
   }
@@ -44,7 +46,7 @@ async function handleSubmit({ data, andContinue }) {
       router.push('/');
     }
   } catch {
-    errorMessage.value = 'Eintrag konnte nicht gespeichert werden.';
+    errorMessage.value = t('entryForm.saveError');
   }
 }
 
@@ -55,12 +57,12 @@ onMounted(loadEntry);
   <main class="flex flex-col gap-6 px-4 py-8 max-w-2xl mx-auto w-full">
     <div class="flex items-center justify-between">
       <h1 class="text-2xl font-semibold">
-        {{ isEditMode ? 'Eintrag bearbeiten' : 'Neuer Eintrag' }}
+        {{ isEditMode ? t('entryForm.editTitle') : t('entryForm.newTitle') }}
       </h1>
       <button
         type="button"
         class="flex items-center justify-center h-9 w-9 rounded-full border border-primary/30 text-lg leading-none hover:bg-primary/10"
-        aria-label="Abbrechen"
+        :aria-label="t('entryForm.cancel')"
         @click="router.push('/')"
       >
         &times;
@@ -77,7 +79,7 @@ onMounted(loadEntry);
       v-if="isLoading"
       class="text-sm text-primary/60"
     >
-      Lädt...
+      {{ t('entryForm.loading') }}
     </p>
 
     <BookingForm

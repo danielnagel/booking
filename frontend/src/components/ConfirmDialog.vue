@@ -1,11 +1,15 @@
 <script setup>
+import { useI18n } from 'vue-i18n';
+
 defineProps({
   open: { type: Boolean, default: false },
-  title: { type: String, default: 'Löschen bestätigen' },
-  message: { type: String, default: 'Soll dieser Eintrag wirklich gelöscht werden?' },
+  title: { type: String, default: null },
+  message: { type: String, default: null },
 });
 
 defineEmits(['confirm', 'cancel']);
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -16,10 +20,10 @@ defineEmits(['confirm', 'cancel']);
   >
     <div class="bg-secondary text-primary rounded-lg p-6 w-full max-w-sm flex flex-col gap-4">
       <h2 class="text-lg font-semibold">
-        {{ title }}
+        {{ title ?? t('confirmDialog.title') }}
       </h2>
       <p class="text-sm">
-        {{ message }}
+        {{ message ?? t('confirmDialog.message') }}
       </p>
       <div class="flex justify-end gap-3">
         <button
@@ -27,14 +31,14 @@ defineEmits(['confirm', 'cancel']);
           class="px-4 py-2 rounded border border-primary/30"
           @click="$emit('cancel')"
         >
-          Abbrechen
+          {{ t('confirmDialog.cancel') }}
         </button>
         <button
           type="button"
           class="px-4 py-2 rounded bg-red-600 text-white"
           @click="$emit('confirm')"
         >
-          Löschen
+          {{ t('confirmDialog.delete') }}
         </button>
       </div>
     </div>

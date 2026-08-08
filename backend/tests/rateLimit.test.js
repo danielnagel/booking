@@ -17,7 +17,7 @@ function buildTestApp() {
     limit: 10,
     standardHeaders: true,
     legacyHeaders: false,
-    message: { error: 'Zu viele Versuche. Bitte später erneut versuchen.' },
+    message: { error: 'rate_limited' },
     skip: () => false,
   });
 
@@ -41,7 +41,7 @@ describe('authRateLimiter configuration', () => {
 
     expect(blockedResponse.status).toBe(429);
     expect(blockedResponse.body).toEqual({
-      error: 'Zu viele Versuche. Bitte später erneut versuchen.',
+      error: 'rate_limited',
     });
   });
 });

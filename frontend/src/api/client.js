@@ -53,7 +53,7 @@ async function request(path, { method = 'GET', body, params, headers } = {}) {
     if (path !== '/auth/me' && router.currentRoute.value.path !== '/login') {
       router.push('/login');
     }
-    throw new ApiError('Nicht angemeldet', 401, null);
+    throw new ApiError('not_authenticated', 401, null);
   }
 
   const contentType = response.headers.get('content-type') || '';
@@ -62,7 +62,7 @@ async function request(path, { method = 'GET', body, params, headers } = {}) {
     : null;
 
   if (!response.ok) {
-    throw new ApiError(data?.error || data?.message || 'Unbekannter Fehler', response.status, data);
+    throw new ApiError(data?.error || data?.message || 'unknown_error', response.status, data);
   }
 
   return data;

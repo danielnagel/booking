@@ -43,10 +43,10 @@ defineEmits(['update:modelValue']);
     >
       <option
         v-for="option in options"
-        :key="option"
-        :value="option"
+        :key="option.value ?? option"
+        :value="option.value ?? option"
       >
-        {{ option }}
+        {{ option.label ?? option }}
       </option>
     </select>
     <template v-else>

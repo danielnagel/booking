@@ -1,11 +1,13 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 import { apiClient } from '../api/client';
 import BookingTable from '../components/BookingTable.vue';
 import ConfirmDialog from '../components/ConfirmDialog.vue';
 
+const { t } = useI18n();
 const router = useRouter();
 
 const PAGE_SIZE = 50;
@@ -42,7 +44,7 @@ async function fetchBookings() {
     rows.value = data?.data ?? [];
     totalCount.value = data?.total ?? 0;
   } catch {
-    errorMessage.value = 'Einträge konnten nicht geladen werden.';
+    errorMessage.value = t('overview.loadError');
   } finally {
     isLoading.value = false;
   }
@@ -84,7 +86,7 @@ async function confirmDelete() {
     }
     await fetchBookings();
   } catch {
-    errorMessage.value = 'Eintrag konnte nicht gelöscht werden.';
+    errorMessage.value = t('overview.deleteError');
   }
 }
 
@@ -99,13 +101,13 @@ onMounted(fetchBookings);
   <main class="flex flex-col gap-6 px-4 py-8 max-w-6xl mx-auto w-full">
     <div class="flex items-center justify-between">
       <h1 class="text-2xl font-semibold">
-        Übersicht
+        {{ t('overview.title') }}
       </h1>
       <router-link
         to="/eingabe"
         class="bg-accent text-secondary font-semibold rounded px-5 py-2.5 shadow"
       >
-        Neuer Eintrag
+        {{ t('overview.newEntry') }}
       </router-link>
     </div>
 
@@ -119,7 +121,7 @@ onMounted(fetchBookings);
       v-if="isLoading"
       class="text-sm text-primary/60"
     >
-      Lädt...
+      {{ t('overview.loading') }}
     </p>
 
     <BookingTable
@@ -139,7 +141,6 @@ onMounted(fetchBookings);
 
     <ConfirmDialog
       :open="!!deleteTarget"
-      message="Soll dieser Eintrag wirklich gelöscht werden?"
       @confirm="confirmDelete"
       @cancel="cancelDelete"
     />

@@ -7,21 +7,21 @@ describe('BookingForm', () => {
   it('marks only the event name as required and shows the Euro fee label', () => {
     render(BookingForm);
 
-    expect(screen.getByLabelText(/Veranstaltungsname/)).toBeRequired();
-    expect(screen.getByLabelText('Datum')).not.toBeRequired();
-    expect(screen.getByLabelText('Veranstalter')).not.toBeRequired();
+    expect(screen.getByLabelText(/Event name/)).toBeRequired();
+    expect(screen.getByLabelText('Date')).not.toBeRequired();
+    expect(screen.getByLabelText('Organizer')).not.toBeRequired();
 
-    const feeInput = screen.getByLabelText('Gage (€)');
+    const feeInput = screen.getByLabelText('Fee (€)');
     expect(feeInput).not.toBeRequired();
     expect(feeInput).toHaveAttribute('type', 'number');
   });
 
-  it('emits submit with andContinue: true and the entered data for the "nächster Eintrag" button', async () => {
+  it('emits submit with andContinue: true and the entered data for the "next entry" button', async () => {
     const { emitted } = render(BookingForm);
 
-    await fireEvent.update(screen.getByLabelText(/Veranstaltungsname/), 'Sommerfest');
-    await fireEvent.update(screen.getByLabelText('Gage (€)'), '450');
-    await fireEvent.click(screen.getByRole('button', { name: 'Hinzufügen und nächster Eintrag' }));
+    await fireEvent.update(screen.getByLabelText(/Event name/), 'Sommerfest');
+    await fireEvent.update(screen.getByLabelText('Fee (€)'), '450');
+    await fireEvent.click(screen.getByRole('button', { name: 'Add and next entry' }));
 
     expect(emitted().submit).toHaveLength(1);
     expect(emitted().submit[0][0]).toEqual({
@@ -30,11 +30,11 @@ describe('BookingForm', () => {
     });
   });
 
-  it('emits submit with andContinue: false for the "zurück zur Übersicht" button', async () => {
+  it('emits submit with andContinue: false for the "back to overview" button', async () => {
     const { emitted } = render(BookingForm);
 
-    await fireEvent.update(screen.getByLabelText(/Veranstaltungsname/), 'Herbstfest');
-    await fireEvent.click(screen.getByRole('button', { name: 'Hinzufügen und zurück zur Übersicht' }));
+    await fireEvent.update(screen.getByLabelText(/Event name/), 'Herbstfest');
+    await fireEvent.click(screen.getByRole('button', { name: 'Add and back to overview' }));
 
     expect(emitted().submit).toHaveLength(1);
     expect(emitted().submit[0][0]).toEqual({
@@ -46,12 +46,12 @@ describe('BookingForm', () => {
   it('does not require any field other than the event name to emit a payload', async () => {
     const { emitted } = render(BookingForm);
 
-    await fireEvent.click(screen.getByRole('button', { name: 'Hinzufügen und zurück zur Übersicht' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Add and back to overview' }));
 
     expect(emitted().submit[0][0].data.event_name).toBe('');
   });
 
-  it('pre-fills fields from initialData and shows "Speichern"-labeled buttons in edit mode', () => {
+  it('pre-fills fields from initialData and shows "Save"-labeled buttons in edit mode', () => {
     render(BookingForm, {
       props: {
         isEditMode: true,
@@ -59,9 +59,9 @@ describe('BookingForm', () => {
       },
     });
 
-    expect(screen.getByLabelText(/Veranstaltungsname/).value).toBe('Bestehender Auftritt');
-    expect(screen.getByLabelText('Gage (€)').value).toBe('300');
-    expect(screen.getByRole('button', { name: 'Speichern und nächster Eintrag' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Speichern und zurück zur Übersicht' })).toBeInTheDocument();
+    expect(screen.getByLabelText(/Event name/).value).toBe('Bestehender Auftritt');
+    expect(screen.getByLabelText('Fee (€)').value).toBe('300');
+    expect(screen.getByRole('button', { name: 'Save and next entry' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Save and back to overview' })).toBeInTheDocument();
   });
 });

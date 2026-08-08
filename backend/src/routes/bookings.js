@@ -119,7 +119,7 @@ router.get('/suggestions/:field', async (req, res) => {
   const { q } = req.query;
 
   if (!AUTOCOMPLETE_COLUMNS.includes(field)) {
-    return res.status(400).json({ error: 'Ungültiges Feld.' });
+    return res.status(400).json({ error: 'invalid_field' });
   }
 
   const { rows } = await pool.query(
@@ -145,7 +145,7 @@ router.get('/:id', async (req, res) => {
   );
 
   if (rows.length === 0) {
-    return res.status(404).json({ error: 'Eintrag nicht gefunden.' });
+    return res.status(404).json({ error: 'booking_not_found' });
   }
 
   return res.status(200).json(rows[0]);
@@ -155,11 +155,11 @@ router.post('/', async (req, res) => {
   const { event_name: eventName } = req.body ?? {};
 
   if (!eventName || !String(eventName).trim()) {
-    return res.status(400).json({ error: 'event_name ist erforderlich.' });
+    return res.status(400).json({ error: 'event_name_required' });
   }
 
   if (req.body?.status && !STATUS_VALUES.includes(req.body.status)) {
-    return res.status(400).json({ error: 'Ungültiger Status.' });
+    return res.status(400).json({ error: 'invalid_status' });
   }
 
   const values = WRITABLE_FIELDS.map((field) => {
@@ -186,11 +186,11 @@ router.put('/:id', async (req, res) => {
   const { event_name: eventName } = req.body ?? {};
 
   if (!eventName || !String(eventName).trim()) {
-    return res.status(400).json({ error: 'event_name ist erforderlich.' });
+    return res.status(400).json({ error: 'event_name_required' });
   }
 
   if (req.body?.status && !STATUS_VALUES.includes(req.body.status)) {
-    return res.status(400).json({ error: 'Ungültiger Status.' });
+    return res.status(400).json({ error: 'invalid_status' });
   }
 
   const values = WRITABLE_FIELDS.map((field) => normalizeValue(req.body?.[field]));
@@ -211,7 +211,7 @@ router.put('/:id', async (req, res) => {
   );
 
   if (rows.length === 0) {
-    return res.status(404).json({ error: 'Eintrag nicht gefunden.' });
+    return res.status(404).json({ error: 'booking_not_found' });
   }
 
   return res.status(200).json(rows[0]);
@@ -223,7 +223,7 @@ router.delete('/:id', async (req, res) => {
   const { rowCount } = await pool.query('DELETE FROM bookings WHERE id = $1', [id]);
 
   if (rowCount === 0) {
-    return res.status(404).json({ error: 'Eintrag nicht gefunden.' });
+    return res.status(404).json({ error: 'booking_not_found' });
   }
 
   return res.status(204).send();

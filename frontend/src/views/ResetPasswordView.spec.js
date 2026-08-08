@@ -41,11 +41,11 @@ describe('ResetPasswordView', () => {
 
     render(ResetPasswordView, { global: { plugins: [router] } });
 
-    expect(screen.queryByLabelText(/Benutzername/)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Username/)).not.toBeInTheDocument();
 
-    await fireEvent.update(screen.getByLabelText(/^Reset-Code/), 'RESET-CODE-1');
-    await fireEvent.update(screen.getByLabelText(/^Neues Passwort/), 'newSecret123');
-    await fireEvent.click(screen.getByRole('button', { name: 'Passwort zurücksetzen' }));
+    await fireEvent.update(screen.getByLabelText(/^Reset code/), 'RESET-CODE-1');
+    await fireEvent.update(screen.getByLabelText(/^New password/), 'newSecret123');
+    await fireEvent.click(screen.getByRole('button', { name: 'Reset password' }));
 
     expect(apiClient.post).toHaveBeenCalledWith('/auth/reset-password', {
       resetCode: 'RESET-CODE-1',
@@ -55,17 +55,19 @@ describe('ResetPasswordView', () => {
   });
 
   it('shows an error message when the reset code is invalid', async () => {
-    apiClient.post.mockRejectedValueOnce(new Error('invalid reset code'));
+    apiClient.post.mockRejectedValueOnce(new Error('reset_code_invalid'));
     const router = createTestRouter();
     await router.isReady();
 
     render(ResetPasswordView, { global: { plugins: [router] } });
 
-    await fireEvent.update(screen.getByLabelText(/^Reset-Code/), 'BAD-CODE');
-    await fireEvent.update(screen.getByLabelText(/^Neues Passwort/), 'newSecret123');
-    await fireEvent.click(screen.getByRole('button', { name: 'Passwort zurücksetzen' }));
+    await fireEvent.update(screen.getByLabelText(/^Reset code/), 'BAD-CODE');
+    await fireEvent.update(screen.getByLabelText(/^New password/), 'newSecret123');
+    await fireEvent.click(screen.getByRole('button', { name: 'Reset password' }));
 
-    expect(await screen.findByText('invalid reset code')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Reset code is invalid, expired, or already used.'),
+    ).toBeInTheDocument();
     expect(router.currentRoute.value.path).toBe('/passwort-zuruecksetzen');
   });
 
@@ -75,6 +77,6 @@ describe('ResetPasswordView', () => {
 
     render(ResetPasswordView, { global: { plugins: [router] } });
 
-    expect(screen.getByRole('link', { name: /Zurück zum Login/ })).toHaveAttribute('href', '/login');
+    expect(screen.getByRole('link', { name: /Back to login/ })).toHaveAttribute('href', '/login');
   });
 });

@@ -1,7 +1,9 @@
 <script setup>
 import { reactive, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { apiClient } from '../api/client';
+import { useStatusOptions } from '../constants/bookingStatus';
 import FormField from './FormField.vue';
 
 const props = defineProps({
@@ -11,7 +13,8 @@ const props = defineProps({
 
 const emit = defineEmits(['submit']);
 
-const STATUS_OPTIONS = ['offen', 'angenommen', 'abgelehnt', 'storniert'];
+const { t } = useI18n();
+const statusOptions = useStatusOptions();
 
 function emptyForm() {
   return {
@@ -84,69 +87,69 @@ function handleSubmit(andContinue) {
     <FormField
       id="event_name"
       v-model="form.event_name"
-      label="Veranstaltungsname"
+      :label="t('bookingForm.eventName')"
       required
     />
     <FormField
       id="event_date"
       v-model="form.event_date"
-      label="Datum"
+      :label="t('bookingForm.eventDate')"
       type="date"
     />
     <FormField
       id="status"
       v-model="form.status"
-      label="Status"
+      :label="t('bookingForm.status')"
       type="select"
-      :options="STATUS_OPTIONS"
+      :options="statusOptions"
     />
     <FormField
       id="organizer"
       v-model="form.organizer"
-      label="Veranstalter"
+      :label="t('bookingForm.organizer')"
       :suggestions="suggestions.organizer"
     />
     <FormField
       id="organizer_website"
       v-model="form.organizer_website"
-      label="Veranstalter-Website"
+      :label="t('bookingForm.organizerWebsite')"
       type="url"
     />
     <FormField
       id="organizer_email"
       v-model="form.organizer_email"
-      label="Veranstalter-E-Mail"
+      :label="t('bookingForm.organizerEmail')"
       type="email"
       :suggestions="suggestions.organizer_email"
     />
     <FormField
       id="application_text"
       v-model="form.application_text"
-      label="Bewerbungstext"
+      :label="t('bookingForm.applicationText')"
       type="textarea"
     />
     <FormField
       id="venue_street"
       v-model="form.venue_street"
-      label="Straße"
+      :label="t('bookingForm.venueStreet')"
       :suggestions="suggestions.venue_street"
     />
     <FormField
       id="venue_zip"
       v-model="form.venue_zip"
-      label="PLZ"
+      :label="t('bookingForm.venueZip')"
       :suggestions="suggestions.venue_zip"
     />
     <FormField
       id="venue_city"
       v-model="form.venue_city"
-      label="Ort"
+      :label="t('bookingForm.venueCity')"
       :suggestions="suggestions.venue_city"
     />
     <FormField
       id="fee"
       v-model="form.fee"
-      label="Gage (€)"
+      :label="t('bookingForm.fee')"
       type="number"
       step="0.01"
     />
@@ -157,14 +160,14 @@ function handleSubmit(andContinue) {
         class="bg-primary text-secondary rounded px-4 py-2"
         @click="handleSubmit(true)"
       >
-        {{ isEditMode ? 'Speichern und nächster Eintrag' : 'Hinzufügen und nächster Eintrag' }}
+        {{ isEditMode ? t('bookingForm.saveAndNext') : t('bookingForm.addAndNext') }}
       </button>
       <button
         type="button"
         class="bg-accent text-secondary rounded px-4 py-2"
         @click="handleSubmit(false)"
       >
-        {{ isEditMode ? 'Speichern und zurück zur Übersicht' : 'Hinzufügen und zurück zur Übersicht' }}
+        {{ isEditMode ? t('bookingForm.saveAndBack') : t('bookingForm.addAndBack') }}
       </button>
     </div>
   </form>

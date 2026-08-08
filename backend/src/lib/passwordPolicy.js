@@ -1,5 +1,6 @@
-export const PASSWORD_POLICY_MESSAGE =
-  'Passwort muss mindestens 12 Zeichen sowie Groß-/Kleinschreibung, eine Zahl und ein Sonderzeichen enthalten.';
+// A stable error code, not display text - the frontend translates it based
+// on the selected UI language (see frontend/src/i18n/errors.js).
+export const PASSWORD_POLICY_ERROR_CODE = 'invalid_password_policy';
 
 export function isPasswordValid(password) {
   if (typeof password !== 'string' || password.length < 12) return false;

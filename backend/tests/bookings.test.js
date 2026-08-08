@@ -58,7 +58,7 @@ describe('POST /api/bookings', () => {
     const response = await agent.post('/api/bookings').send({ organizer: 'Someone' });
 
     expect(response.status).toBe(400);
-    expect(response.body.error).toMatch(/event_name/);
+    expect(response.body.error).toBe('event_name_required');
   });
 
   it('rejects a blank event_name', async () => {
@@ -97,7 +97,7 @@ describe('POST /api/bookings', () => {
       .send({ event_name: 'Stadtfest', status: 'unbekannt' });
 
     expect(response.status).toBe(400);
-    expect(response.body.error).toMatch(/Status/);
+    expect(response.body.error).toBe('invalid_status');
   });
 });
 
@@ -283,7 +283,7 @@ describe('PUT /api/bookings/:id', () => {
       .send({ event_name: 'Altes Fest', status: 'unbekannt' });
 
     expect(response.status).toBe(400);
-    expect(response.body.error).toMatch(/Status/);
+    expect(response.body.error).toBe('invalid_status');
   });
 });
 

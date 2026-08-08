@@ -17,15 +17,15 @@ function baseProps(overrides = {}) {
 }
 
 describe('BookingTable', () => {
-  it('renders the column headers including "Gage (€)"', () => {
+  it('renders the column headers including "Fee (€)"', () => {
     render(BookingTable, { props: baseProps() });
 
-    expect(screen.getByRole('columnheader', { name: /Veranstaltung/ })).toBeInTheDocument();
-    expect(screen.getByRole('columnheader', { name: /Gage \(€\)/ })).toBeInTheDocument();
-    expect(screen.getByRole('columnheader', { name: /Aktionen/ })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /Event/ })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /Fee \(€\)/ })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /Actions/ })).toBeInTheDocument();
   });
 
-  it('renders row data, formatting the fee as Euro currency and the date as de-DE', () => {
+  it('renders row data, formatting the fee as Euro currency and the date as en-GB', () => {
     const rows = [
       {
         id: '1',
@@ -37,8 +37,8 @@ describe('BookingTable', () => {
     ];
     render(BookingTable, { props: baseProps({ rows, totalCount: 1 }) });
 
-    const expectedFee = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(450);
-    const expectedDate = new Intl.DateTimeFormat('de-DE').format(new Date('2026-03-15'));
+    const expectedFee = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'EUR' }).format(450);
+    const expectedDate = new Intl.DateTimeFormat('en-GB').format(new Date('2026-03-15'));
     const normalize = (value) => value.replace(/\s+/g, ' ').trim();
 
     expect(screen.getByText('Sommerfest')).toBeInTheDocument();
@@ -51,7 +51,7 @@ describe('BookingTable', () => {
   it('shows a placeholder row when there are no entries', () => {
     render(BookingTable, { props: baseProps() });
 
-    expect(screen.getByText('Keine Einträge gefunden.')).toBeInTheDocument();
+    expect(screen.getByText('No entries found.')).toBeInTheDocument();
   });
 
   it('emits a debounced search-change event when typing into the search field', async () => {
@@ -59,7 +59,7 @@ describe('BookingTable', () => {
     try {
       const { emitted } = render(BookingTable, { props: baseProps() });
 
-      const searchInput = screen.getByPlaceholderText('Suche...');
+      const searchInput = screen.getByPlaceholderText('Search...');
       await fireEvent.update(searchInput, 'Stadtfest');
 
       expect(emitted()['search-change']).toBeUndefined();
@@ -75,15 +75,15 @@ describe('BookingTable', () => {
   it('cycles sort direction and emits sort-change when clicking a sortable column header', async () => {
     const { emitted, rerender } = render(BookingTable, { props: baseProps() });
 
-    await fireEvent.click(screen.getByText('Veranstaltung'));
+    await fireEvent.click(screen.getByText('Event'));
     expect(emitted()['sort-change'][0][0]).toEqual({ sortBy: 'event_name', sortDir: 'asc' });
 
     await rerender(baseProps({ sortBy: 'event_name', sortDir: 'asc' }));
-    await fireEvent.click(screen.getByText(/Veranstaltung/));
+    await fireEvent.click(screen.getByText(/Event/));
     expect(emitted()['sort-change'][1][0]).toEqual({ sortBy: 'event_name', sortDir: 'desc' });
 
     await rerender(baseProps({ sortBy: 'event_name', sortDir: 'desc' }));
-    await fireEvent.click(screen.getByText(/Veranstaltung/));
+    await fireEvent.click(screen.getByText(/Event/));
     expect(emitted()['sort-change'][2][0]).toEqual({ sortBy: null, sortDir: null });
   });
 
@@ -102,8 +102,8 @@ describe('BookingTable', () => {
     ];
     render(BookingTable, { props: baseProps({ rows, totalCount: 2 }) });
 
-    const organizerHeader = screen.getByRole('columnheader', { name: /Veranstalter/ });
-    await fireEvent.click(within(organizerHeader).getByRole('button', { name: 'Gruppieren' }));
+    const organizerHeader = screen.getByRole('columnheader', { name: /Organizer/ });
+    await fireEvent.click(within(organizerHeader).getByRole('button', { name: 'Group' }));
 
     const groupToggle = await screen.findByRole('button', { name: /Stadtfest e\.V\. \(2\)/ });
     expect(groupToggle).toBeInTheDocument();
@@ -120,21 +120,21 @@ describe('BookingTable', () => {
       props: baseProps({ page: 2, pageCount: 3, totalCount: 120 }),
     });
 
-    expect(screen.getByText('Seite 2 von 3')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Zurück' })).not.toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Weiter' })).not.toBeDisabled();
+    expect(screen.getByText('Page 2 of 3')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Back' })).not.toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Next' })).not.toBeDisabled();
 
-    await fireEvent.click(screen.getByRole('button', { name: 'Zurück' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Back' }));
     expect(emitted()['page-change'][0]).toEqual([1]);
 
-    await fireEvent.click(screen.getByRole('button', { name: 'Weiter' }));
+    await fireEvent.click(screen.getByRole('button', { name: 'Next' }));
     expect(emitted()['page-change'][1]).toEqual([3]);
   });
 
-  it('disables "Zurück" on the first page and "Weiter" on the last page', () => {
+  it('disables "Back" on the first page and "Next" on the last page', () => {
     render(BookingTable, { props: baseProps({ page: 1, pageCount: 1, totalCount: 1 }) });
 
-    expect(screen.getByRole('button', { name: 'Zurück' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Weiter' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled();
   });
 });

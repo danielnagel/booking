@@ -8,7 +8,7 @@ import {
   insertUser,
   insertPasswordResetCode,
 } from './helpers/db.js';
-import { PASSWORD_POLICY_MESSAGE } from '../src/lib/passwordPolicy.js';
+import { PASSWORD_POLICY_ERROR_CODE } from '../src/lib/passwordPolicy.js';
 
 beforeEach(async () => {
   await resetDb();
@@ -39,7 +39,7 @@ describe('POST /api/auth/reset-password', () => {
       .send({ resetCode: code, newPassword: 'weakpassword' });
 
     expect(response.status).toBe(400);
-    expect(response.body.error).toBe(PASSWORD_POLICY_MESSAGE);
+    expect(response.body.error).toBe(PASSWORD_POLICY_ERROR_CODE);
   });
 
   it('rejects a reset code that does not exist', async () => {
@@ -48,7 +48,7 @@ describe('POST /api/auth/reset-password', () => {
       .send({ resetCode: 'does-not-exist', newPassword: 'Br4ndNewPassword!' });
 
     expect(response.status).toBe(400);
-    expect(response.body.error).toMatch(/Reset-Code/);
+    expect(response.body.error).toBe('reset_code_invalid');
   });
 
   it('rejects an expired reset code', async () => {
@@ -63,7 +63,7 @@ describe('POST /api/auth/reset-password', () => {
       .send({ resetCode: code, newPassword: 'Br4ndNewPassword!' });
 
     expect(response.status).toBe(400);
-    expect(response.body.error).toMatch(/Reset-Code/);
+    expect(response.body.error).toBe('reset_code_invalid');
   });
 
   it('rejects an already-used reset code', async () => {
@@ -78,7 +78,7 @@ describe('POST /api/auth/reset-password', () => {
       .send({ resetCode: code, newPassword: 'Br4ndNewPassword!' });
 
     expect(response.status).toBe(400);
-    expect(response.body.error).toMatch(/Reset-Code/);
+    expect(response.body.error).toBe('reset_code_invalid');
   });
 
   it('resets the password of the user the code is bound to, and login works with the new password', async () => {

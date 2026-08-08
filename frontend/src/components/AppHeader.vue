@@ -1,8 +1,11 @@
 <script setup>
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 
 import { useAuthStore } from '../stores/auth';
+import LanguageSwitch from './LanguageSwitch.vue';
 
+const { t } = useI18n();
 const authStore = useAuthStore();
 const router = useRouter();
 const route = useRoute();
@@ -27,13 +30,15 @@ async function handleLogout() {
       <span class="text-lg font-semibold">Booking</span>
     </router-link>
 
+    <LanguageSwitch class="ml-4" />
+
     <button
       v-if="route.name === 'overview'"
       type="button"
       class="ml-4 text-xs text-primary/60 hover:underline"
       @click="handleLogout"
     >
-      Logout
+      {{ t('app.logout') }}
     </button>
   </header>
 </template>

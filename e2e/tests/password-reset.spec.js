@@ -6,7 +6,7 @@ import { runBackendCli, extractCodeFromOutput } from '../helpers/dockerCli.js';
 // user via the backend CLI inside the running container, then the user
 // resets the password with the code, then login with the new password
 // (plans/intial-plan-simple-booking-website-for-bands.md, Testing / E2E).
-test('Admin erzeugt Passwort-Reset-Code per CLI, Nutzer setzt Passwort zurueck und loggt sich mit dem neuen Passwort ein', async ({
+test('Admin creates a password-reset code via the CLI, the user resets the password and logs in with the new one', async ({
   page,
   request,
 }) => {
@@ -30,16 +30,16 @@ test('Admin erzeugt Passwort-Reset-Code per CLI, Nutzer setzt Passwort zurueck u
   const resetCode = extractCodeFromOutput(resetCliOutput);
 
   await page.goto('/passwort-zuruecksetzen');
-  await page.getByLabel('Reset-Code').fill(resetCode);
-  await page.getByLabel('Neues Passwort').fill(newPassword);
-  await page.getByRole('button', { name: 'Passwort zurücksetzen' }).click();
+  await page.getByLabel('Reset code').fill(resetCode);
+  await page.getByLabel('New password').fill(newPassword);
+  await page.getByRole('button', { name: 'Reset password' }).click();
 
   await page.waitForURL((url) => url.pathname === '/login');
 
-  await page.getByLabel('Benutzername').fill(username);
-  await page.getByLabel('Passwort').fill(newPassword);
-  await page.getByRole('button', { name: 'Anmelden' }).click();
+  await page.getByLabel('Username').fill(username);
+  await page.getByLabel('Password').fill(newPassword);
+  await page.getByRole('button', { name: 'Log in' }).click();
 
   await page.waitForURL((url) => url.pathname === '/');
-  await expect(page.getByRole('heading', { name: 'Übersicht' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Overview' })).toBeVisible();
 });

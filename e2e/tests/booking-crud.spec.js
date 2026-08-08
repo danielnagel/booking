@@ -18,7 +18,7 @@ function waitForSearchResponse(page, searchTerm) {
 // field, confirm it appears in the overview, confirm search finds it, edit
 // it, delete it (plans/intial-plan-simple-booking-website-for-bands.md,
 // Testing / E2E).
-test('Login, Eintrag anlegen, in Übersicht bestätigen, per Suche finden, bearbeiten und löschen', async ({
+test('Login, create an entry, confirm it in the overview, find it via search, edit and delete it', async ({
   page,
   request,
 }) => {
@@ -37,31 +37,31 @@ test('Login, Eintrag anlegen, in Übersicht bestätigen, per Suche finden, bearb
   expect(registerResponse.ok()).toBeTruthy();
 
   const eventName = `E2E Stadtfest ${Date.now()}`;
-  const updatedEventName = `${eventName} (bearbeitet)`;
+  const updatedEventName = `${eventName} (edited)`;
 
   await page.goto('/login');
-  await page.getByLabel('Benutzername').fill(username);
-  await page.getByLabel('Passwort').fill(password);
-  await page.getByRole('button', { name: 'Anmelden' }).click();
+  await page.getByLabel('Username').fill(username);
+  await page.getByLabel('Password').fill(password);
+  await page.getByRole('button', { name: 'Log in' }).click();
   await page.waitForURL((url) => url.pathname === '/');
 
-  const totalCountText = page.getByText(/Einträge insgesamt$/);
+  const totalCountText = page.getByText(/entries total$/);
   const totalCountBefore = Number((await totalCountText.textContent()).match(/\d+/)[0]);
 
-  // Create an entry using only the required field (Veranstaltungsname).
-  await page.getByRole('link', { name: 'Neuer Eintrag' }).click();
+  // Create an entry using only the required field (event name).
+  await page.getByRole('link', { name: 'New entry' }).click();
   await page.waitForURL((url) => url.pathname === '/eingabe');
-  await page.getByLabel('Veranstaltungsname').fill(eventName);
+  await page.getByLabel('Event name').fill(eventName);
   await page
-    .getByRole('button', { name: 'Hinzufügen und zurück zur Übersicht' })
+    .getByRole('button', { name: 'Add and back to overview' })
     .click();
 
   // Confirm it appears in the overview: the total row count grew by one.
   await page.waitForURL((url) => url.pathname === '/');
-  await expect(totalCountText).toHaveText(`${totalCountBefore + 1} Einträge insgesamt`);
+  await expect(totalCountText).toHaveText(`${totalCountBefore + 1} entries total`);
 
   // Confirm the search finds it.
-  const searchInput = page.getByPlaceholder('Suche...');
+  const searchInput = page.getByPlaceholder('Search...');
   await searchInput.fill(eventName);
   await waitForSearchResponse(page, eventName);
 
@@ -69,12 +69,12 @@ test('Login, Eintrag anlegen, in Übersicht bestätigen, per Suche finden, bearb
   await expect(row).toBeVisible();
 
   // Edit it.
-  await row.getByRole('button', { name: 'Bearbeiten' }).click();
+  await row.getByRole('button', { name: 'Edit' }).click();
   await page.waitForURL((url) => /^\/eingabe\/.+/.test(url.pathname));
-  await expect(page.getByLabel('Veranstaltungsname')).toHaveValue(eventName);
-  await page.getByLabel('Veranstaltungsname').fill(updatedEventName);
+  await expect(page.getByLabel('Event name')).toHaveValue(eventName);
+  await page.getByLabel('Event name').fill(updatedEventName);
   await page
-    .getByRole('button', { name: 'Speichern und zurück zur Übersicht' })
+    .getByRole('button', { name: 'Save and back to overview' })
     .click();
 
   await page.waitForURL((url) => url.pathname === '/');
@@ -84,9 +84,9 @@ test('Login, Eintrag anlegen, in Übersicht bestätigen, per Suche finden, bearb
   await expect(updatedRow).toBeVisible();
 
   // Delete it.
-  await updatedRow.getByRole('button', { name: 'Löschen' }).click();
-  const confirmDialog = page.locator('div.fixed', { hasText: 'wirklich gelöscht werden' });
-  await confirmDialog.getByRole('button', { name: 'Löschen' }).click();
+  await updatedRow.getByRole('button', { name: 'Delete' }).click();
+  const confirmDialog = page.locator('div.fixed', { hasText: 'really want to delete' });
+  await confirmDialog.getByRole('button', { name: 'Delete' }).click();
 
-  await expect(page.getByText('Keine Einträge gefunden.')).toBeVisible();
+  await expect(page.getByText('No entries found.')).toBeVisible();
 });

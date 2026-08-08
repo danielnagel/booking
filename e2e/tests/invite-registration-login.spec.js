@@ -5,7 +5,7 @@ import { runBackendCli, extractCodeFromOutput } from '../helpers/dockerCli.js';
 // Covers plan flow (1): admin creates an invite code via the backend CLI
 // inside the running container, then registration with that code, then
 // login (plans/intial-plan-simple-booking-website-for-bands.md, Testing / E2E).
-test('Admin erzeugt Invite-Code per CLI, Nutzer registriert sich damit und loggt sich ein', async ({
+test('Admin creates an invite code via the CLI, a user registers with it and logs in', async ({
   page,
 }) => {
   const cliOutput = runBackendCli('invite:create');
@@ -15,17 +15,17 @@ test('Admin erzeugt Invite-Code per CLI, Nutzer registriert sich damit und loggt
   const password = 'Invite-E2e-Passwort-1!';
 
   await page.goto('/registrieren');
-  await page.getByLabel('Invite-Code').fill(inviteCode);
-  await page.getByLabel('Benutzername').fill(username);
-  await page.getByLabel('Passwort').fill(password);
-  await page.getByRole('button', { name: 'Registrieren' }).click();
+  await page.getByLabel('Invite code').fill(inviteCode);
+  await page.getByLabel('Username').fill(username);
+  await page.getByLabel('Password').fill(password);
+  await page.getByRole('button', { name: 'Register' }).click();
 
   await expect(page).toHaveURL(/\/login$/);
 
-  await page.getByLabel('Benutzername').fill(username);
-  await page.getByLabel('Passwort').fill(password);
-  await page.getByRole('button', { name: 'Anmelden' }).click();
+  await page.getByLabel('Username').fill(username);
+  await page.getByLabel('Password').fill(password);
+  await page.getByRole('button', { name: 'Log in' }).click();
 
   await page.waitForURL((url) => url.pathname === '/');
-  await expect(page.getByRole('heading', { name: 'Übersicht' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Overview' })).toBeVisible();
 });

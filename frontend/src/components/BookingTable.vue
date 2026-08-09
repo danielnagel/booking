@@ -11,6 +11,7 @@ import {
 } from '@tanstack/vue-table';
 
 import { useStatusLabel } from '../constants/bookingStatus';
+import TextPreviewDialog from './TextPreviewDialog.vue';
 
 const props = defineProps({
   rows: { type: Array, default: () => [] },
@@ -39,6 +40,36 @@ function formatDate(value) {
   return new Intl.DateTimeFormat(intlLocale.value).format(new Date(value));
 }
 
+const previewOpen = ref(false);
+const previewTitle = ref('');
+const previewText = ref('');
+
+function openPreview(title, text) {
+  previewTitle.value = title;
+  previewText.value = text;
+  previewOpen.value = true;
+}
+
+function closePreview() {
+  previewOpen.value = false;
+}
+
+function truncatedCell(labelKey) {
+  return (info) => {
+    const value = info.getValue() ?? '';
+    if (!value) return '';
+    return h(
+      'button',
+      {
+        type: 'button',
+        class: 'block max-w-[100px] truncate underline decoration-dotted underline-offset-2',
+        onClick: () => openPreview(t(labelKey), value),
+      },
+      value,
+    );
+  };
+}
+
 const columnHelper = createColumnHelper();
 
 const columns = [
@@ -56,6 +87,11 @@ const columns = [
     enableGrouping: true,
     cell: (info) => statusLabel(info.getValue()),
   }),
+  columnHelper.accessor('last_contact_date', {
+    header: () => t('bookingTable.columns.lastContactDate'),
+    enableGrouping: false,
+    cell: (info) => formatDate(info.getValue()),
+  }),
   columnHelper.accessor('created_by', {
     header: () => t('bookingTable.columns.createdBy'),
     enableGrouping: true,
@@ -65,8 +101,22 @@ const columns = [
     header: () => t('bookingTable.columns.organizer'),
     enableGrouping: true,
   }),
+  columnHelper.accessor('contact_person', {
+    header: () => t('bookingTable.columns.contactPerson'),
+    enableGrouping: true,
+  }),
   columnHelper.accessor('organizer_website', {
     header: () => t('bookingTable.columns.website'),
+    enableGrouping: false,
+    enableSorting: false,
+  }),
+  columnHelper.accessor('organizer_facebook', {
+    header: () => t('bookingTable.columns.facebook'),
+    enableGrouping: false,
+    enableSorting: false,
+  }),
+  columnHelper.accessor('organizer_instagram', {
+    header: () => t('bookingTable.columns.instagram'),
     enableGrouping: false,
     enableSorting: false,
   }),
@@ -75,10 +125,21 @@ const columns = [
     enableGrouping: false,
     enableSorting: false,
   }),
+  columnHelper.accessor('organizer_phone', {
+    header: () => t('bookingTable.columns.phone'),
+    enableGrouping: false,
+  }),
   columnHelper.accessor('application_text', {
     header: () => t('bookingTable.columns.applicationText'),
     enableGrouping: false,
     enableSorting: false,
+    cell: truncatedCell('bookingTable.columns.applicationText'),
+  }),
+  columnHelper.accessor('notes', {
+    header: () => t('bookingTable.columns.notes'),
+    enableGrouping: false,
+    enableSorting: false,
+    cell: truncatedCell('bookingTable.columns.notes'),
   }),
   columnHelper.accessor('venue_street', {
     header: () => t('bookingTable.columns.street'),
@@ -202,7 +263,7 @@ function goToPage(page) {
       class="bg-secondary text-primary border border-primary rounded px-3 py-2 max-w-sm"
     >
 
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto -mx-4 md:mx-0 md:w-[90vw] md:relative md:left-1/2 md:-translate-x-1/2">
       <table class="min-w-full border-collapse">
         <thead>
           <tr
@@ -306,5 +367,12 @@ function goToPage(page) {
         </button>
       </div>
     </div>
+
+    <TextPreviewDialog
+      :open="previewOpen"
+      :title="previewTitle"
+      :text="previewText"
+      @close="closePreview"
+    />
   </div>
 </template>

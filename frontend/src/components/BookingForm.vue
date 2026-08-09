@@ -29,6 +29,12 @@ function emptyForm() {
     venue_city: '',
     fee: '',
     status: 'offen',
+    contact_person: '',
+    organizer_phone: '',
+    organizer_facebook: '',
+    organizer_instagram: '',
+    last_contact_date: '',
+    notes: '',
   };
 }
 
@@ -40,6 +46,8 @@ const suggestions = reactive({
   venue_zip: [],
   venue_city: [],
   organizer_email: [],
+  contact_person: [],
+  organizer_phone: [],
 });
 
 const suggestionDebounceHandles = {};
@@ -104,15 +112,39 @@ function handleSubmit(andContinue) {
       :options="statusOptions"
     />
     <FormField
+      id="last_contact_date"
+      v-model="form.last_contact_date"
+      :label="t('bookingForm.lastContactDate')"
+      type="date"
+    />
+    <FormField
       id="organizer"
       v-model="form.organizer"
       :label="t('bookingForm.organizer')"
       :suggestions="suggestions.organizer"
     />
     <FormField
+      id="contact_person"
+      v-model="form.contact_person"
+      :label="t('bookingForm.contactPerson')"
+      :suggestions="suggestions.contact_person"
+    />
+    <FormField
       id="organizer_website"
       v-model="form.organizer_website"
       :label="t('bookingForm.organizerWebsite')"
+      type="url"
+    />
+    <FormField
+      id="organizer_facebook"
+      v-model="form.organizer_facebook"
+      :label="t('bookingForm.organizerFacebook')"
+      type="url"
+    />
+    <FormField
+      id="organizer_instagram"
+      v-model="form.organizer_instagram"
+      :label="t('bookingForm.organizerInstagram')"
       type="url"
     />
     <FormField
@@ -123,9 +155,21 @@ function handleSubmit(andContinue) {
       :suggestions="suggestions.organizer_email"
     />
     <FormField
+      id="organizer_phone"
+      v-model="form.organizer_phone"
+      :label="t('bookingForm.organizerPhone')"
+      :suggestions="suggestions.organizer_phone"
+    />
+    <FormField
       id="application_text"
       v-model="form.application_text"
       :label="t('bookingForm.applicationText')"
+      type="textarea"
+    />
+    <FormField
+      id="notes"
+      v-model="form.notes"
+      :label="t('bookingForm.notes')"
       type="textarea"
     />
     <FormField

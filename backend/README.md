@@ -99,9 +99,11 @@ keeps working until it expires, even after a reset.
 
 Writable fields on `POST`/`PUT`: `event_name`, `event_date`, `organizer`,
 `organizer_website`, `organizer_email`, `application_text`, `venue_street`,
-`venue_zip`, `venue_city`, `fee`. The `created_by`, `created_at`,
-`updated_by`, `updated_at` metadata is included in responses but is purely
-DB metadata and is not set by the client.
+`venue_zip`, `venue_city`, `fee`, `contact_person`, `organizer_phone`,
+`organizer_facebook`, `organizer_instagram`, `last_contact_date`, `notes`.
+The `created_by`, `created_at`, `updated_by`, `updated_at` metadata is
+included in responses but is purely DB metadata and is not set by the
+client.
 
 ## User management
 

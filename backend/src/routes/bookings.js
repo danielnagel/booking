@@ -15,6 +15,11 @@ const SEARCHABLE_COLUMNS = [
   'venue_street',
   'venue_zip',
   'venue_city',
+  'contact_person',
+  'organizer_phone',
+  'organizer_facebook',
+  'organizer_instagram',
+  'notes',
 ];
 
 const SORTABLE_COLUMNS = [
@@ -29,6 +34,12 @@ const SORTABLE_COLUMNS = [
   'venue_city',
   'fee',
   'status',
+  'contact_person',
+  'organizer_phone',
+  'organizer_facebook',
+  'organizer_instagram',
+  'last_contact_date',
+  'notes',
 ];
 
 const WRITABLE_FIELDS = [
@@ -43,6 +54,12 @@ const WRITABLE_FIELDS = [
   'venue_city',
   'fee',
   'status',
+  'contact_person',
+  'organizer_phone',
+  'organizer_facebook',
+  'organizer_instagram',
+  'last_contact_date',
+  'notes',
 ];
 
 const STATUS_VALUES = ['offen', 'angenommen', 'abgelehnt', 'storniert'];
@@ -89,6 +106,8 @@ router.get('/', async (req, res) => {
   const { rows } = await pool.query(
     `SELECT id, event_name, event_date, organizer, organizer_website, organizer_email,
             application_text, venue_street, venue_zip, venue_city, fee, status,
+            contact_person, organizer_phone, organizer_facebook, organizer_instagram,
+            last_contact_date, notes,
             created_by, created_at, updated_by, updated_at
      FROM bookings
      ${whereSql}
@@ -112,6 +131,8 @@ const AUTOCOMPLETE_COLUMNS = [
   'venue_street',
   'organizer_email',
   'status',
+  'contact_person',
+  'organizer_phone',
 ];
 
 router.get('/suggestions/:field', async (req, res) => {
@@ -138,6 +159,8 @@ router.get('/:id', async (req, res) => {
   const { rows } = await pool.query(
     `SELECT id, event_name, event_date, organizer, organizer_website, organizer_email,
             application_text, venue_street, venue_zip, venue_city, fee, status,
+            contact_person, organizer_phone, organizer_facebook, organizer_instagram,
+            last_contact_date, notes,
             created_by, created_at, updated_by, updated_at
      FROM bookings
      WHERE id = $1`,
@@ -174,6 +197,8 @@ router.post('/', async (req, res) => {
      VALUES (${placeholders.join(', ')})
      RETURNING id, event_name, event_date, organizer, organizer_website, organizer_email,
                application_text, venue_street, venue_zip, venue_city, fee, status,
+               contact_person, organizer_phone, organizer_facebook, organizer_instagram,
+               last_contact_date, notes,
                created_by, created_at, updated_by, updated_at`,
     [req.user.username, ...values],
   );
@@ -206,6 +231,8 @@ router.put('/:id', async (req, res) => {
      WHERE id = $${values.length + 2}
      RETURNING id, event_name, event_date, organizer, organizer_website, organizer_email,
                application_text, venue_street, venue_zip, venue_city, fee, status,
+               contact_person, organizer_phone, organizer_facebook, organizer_instagram,
+               last_contact_date, notes,
                created_by, created_at, updated_by, updated_at`,
     [...values, req.user.username, id],
   );

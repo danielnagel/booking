@@ -4,6 +4,11 @@ import app from '../src/app.js';
 import { resetDb, closeDb, insertBooking } from './helpers/db.js';
 import { createAndLoginUser } from './helpers/auth.js';
 
+function toDateOnly(isoString) {
+  const date = new Date(isoString);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
 beforeEach(async () => {
   await resetDb();
 });
@@ -41,6 +46,12 @@ describe('POST /api/bookings', () => {
       venue_zip: '12345',
       venue_city: 'Musterhausen',
       fee: 500,
+      contact_person: 'Erika Musterfrau',
+      organizer_phone: '01234/567890',
+      organizer_facebook: 'https://facebook.com/musterhausen',
+      organizer_instagram: 'https://instagram.com/musterhausen',
+      last_contact_date: '2026-08-01',
+      notes: 'Erstkontakt per Telefon.',
     };
 
     const response = await agent.post('/api/bookings').send(payload);
@@ -50,6 +61,12 @@ describe('POST /api/bookings', () => {
     expect(response.body.organizer).toBe(payload.organizer);
     expect(response.body.venue_city).toBe(payload.venue_city);
     expect(Number(response.body.fee)).toBe(500);
+    expect(response.body.contact_person).toBe(payload.contact_person);
+    expect(response.body.organizer_phone).toBe(payload.organizer_phone);
+    expect(response.body.organizer_facebook).toBe(payload.organizer_facebook);
+    expect(response.body.organizer_instagram).toBe(payload.organizer_instagram);
+    expect(toDateOnly(response.body.last_contact_date)).toBe(payload.last_contact_date);
+    expect(response.body.notes).toBe(payload.notes);
   });
 
   it('rejects a missing event_name', async () => {

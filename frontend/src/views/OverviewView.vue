@@ -98,7 +98,7 @@ onMounted(fetchBookings);
 </script>
 
 <template>
-  <main class="flex flex-col gap-6 px-4 py-8 max-w-6xl mx-auto w-full">
+  <main class="flex flex-col gap-6 px-4 py-8 w-[90vw] mx-auto">
     <div class="flex items-center justify-between">
       <h1 class="text-2xl font-semibold">
         {{ t('overview.title') }}

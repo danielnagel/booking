@@ -263,7 +263,7 @@ function goToPage(page) {
       class="bg-secondary text-primary border border-primary rounded px-3 py-2 max-w-sm"
     >
 
-    <div class="overflow-x-auto -mx-4 md:mx-0 md:w-[90vw] md:relative md:left-1/2 md:-translate-x-1/2">
+    <div class="overflow-x-auto -mx-4 md:mx-0 w-auto md:w-full">
       <table class="min-w-full border-collapse">
         <thead>
           <tr

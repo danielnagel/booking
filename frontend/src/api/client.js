@@ -47,8 +47,8 @@ async function request(path, { method = 'GET', body, params, headers } = {}) {
     // every navigation, see router/index.js); a 401 there just means "not
     // logged in yet" and is handled by the caller (authStore.fetchCurrentUser),
     // not a session that expired mid-use, so it must not force a redirect -
-    // otherwise visiting a public route like /login, /registrieren or
-    // /passwort-zuruecksetzen without a session cookie would race with the
+    // otherwise visiting a public route like /login, /register or
+    // /reset-password without a session cookie would race with the
     // navigation that's already in progress.
     if (path !== '/auth/me' && router.currentRoute.value.path !== '/login') {
       router.push('/login');

@@ -20,11 +20,11 @@ function createTestRouter() {
   const router = createRouter({
     history: createMemoryHistory(),
     routes: [
-      { path: '/registrieren', name: 'register', component: RegisterView },
+      { path: '/register', name: 'register', component: RegisterView },
       { path: '/login', name: 'login', component: { template: '<div>Login</div>' } },
     ],
   });
-  router.push('/registrieren');
+  router.push('/register');
   return router;
 }
 
@@ -69,7 +69,7 @@ describe('RegisterView', () => {
     expect(
       await screen.findByText('Invite code is invalid, expired, or deactivated.'),
     ).toBeInTheDocument();
-    expect(router.currentRoute.value.path).toBe('/registrieren');
+    expect(router.currentRoute.value.path).toBe('/register');
   });
 
   it('links back to the login page', async () => {

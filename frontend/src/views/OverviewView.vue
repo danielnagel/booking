@@ -69,7 +69,7 @@ function handlePageChange(page) {
 }
 
 function handleEdit(id) {
-  router.push(`/eingabe/${id}`);
+  router.push(`/entry/${id}`);
 }
 
 function handleDeleteRequest(id) {
@@ -104,7 +104,7 @@ onMounted(fetchBookings);
         {{ t('overview.title') }}
       </h1>
       <router-link
-        to="/eingabe"
+        to="/entry"
         class="bg-accent text-secondary font-semibold rounded px-5 py-2.5 shadow"
       >
         {{ t('overview.newEntry') }}

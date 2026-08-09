@@ -80,13 +80,13 @@ async function handleSubmit() {
     <div class="mt-6 flex flex-col items-center gap-2 text-sm">
       <router-link
         v-if="!demoMode"
-        to="/registrieren"
+        to="/register"
         class="underline"
       >
         {{ t('login.noAccount') }}
       </router-link>
       <router-link
-        to="/passwort-zuruecksetzen"
+        to="/reset-password"
         class="underline"
       >
         {{ t('login.forgotPassword') }}

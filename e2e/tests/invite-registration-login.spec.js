@@ -14,7 +14,7 @@ test('Admin creates an invite code via the CLI, a user registers with it and log
   const username = `e2e-invite-${Date.now()}`;
   const password = 'Invite-E2e-Passwort-1!';
 
-  await page.goto('/registrieren');
+  await page.goto('/register');
   await page.getByLabel('Invite code').fill(inviteCode);
   await page.getByLabel('Username').fill(username);
   await page.getByLabel('Password').fill(password);

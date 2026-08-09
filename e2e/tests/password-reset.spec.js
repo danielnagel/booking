@@ -29,7 +29,7 @@ test('Admin creates a password-reset code via the CLI, the user resets the passw
   const resetCliOutput = runBackendCli('password-reset:create', [username]);
   const resetCode = extractCodeFromOutput(resetCliOutput);
 
-  await page.goto('/passwort-zuruecksetzen');
+  await page.goto('/reset-password');
   await page.getByLabel('Reset code').fill(resetCode);
   await page.getByLabel('New password').fill(newPassword);
   await page.getByRole('button', { name: 'Reset password' }).click();

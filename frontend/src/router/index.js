@@ -10,13 +10,13 @@ const routes = [
     meta: { requiresAuth: false },
   },
   {
-    path: '/registrieren',
+    path: '/register',
     name: 'register',
     component: () => import('../views/RegisterView.vue'),
     meta: { requiresAuth: false },
   },
   {
-    path: '/passwort-zuruecksetzen',
+    path: '/reset-password',
     name: 'reset-password',
     component: () => import('../views/ResetPasswordView.vue'),
     meta: { requiresAuth: false },
@@ -28,13 +28,13 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: '/eingabe',
+    path: '/entry',
     name: 'entry-create',
     component: () => import('../views/EntryFormView.vue'),
     meta: { requiresAuth: true },
   },
   {
-    path: '/eingabe/:id',
+    path: '/entry/:id',
     name: 'entry-edit',
     component: () => import('../views/EntryFormView.vue'),
     meta: { requiresAuth: true },

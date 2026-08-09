@@ -20,9 +20,9 @@ on port 3000 (`npm run dev --workspace=backend`).
 - **`App.vue`** – root component, wraps `<router-view>` with
   `AppHeader`/`AppFooter`, so they appear on every page including login/
   register/password reset.
-- **`router/index.js`** – routes `/login`, `/registrieren`,
-  `/passwort-zuruecksetzen`, `/` (overview), `/eingabe` (new entry) and
-  `/eingabe/:id` (edit, same component as create). A navigation guard checks
+- **`router/index.js`** – routes `/login`, `/register`,
+  `/reset-password`, `/` (overview), `/entry` (new entry) and
+  `/entry/:id` (edit, same component as create). A navigation guard checks
   the auth status before every route change and redirects to `/login` if
   there is no session.
 - **`stores/auth.js`** (Pinia) – login/logout/registration/password reset
@@ -31,8 +31,8 @@ on port 3000 (`npm run dev --workspace=backend`).
 - **`api/client.js`** – fetch wrapper with `credentials: 'include'` (uses
   the httpOnly auth cookie) and centralized `401` handling (redirects to
   `/login`, except for the initial `/auth/me` check itself).
-- **`views/LoginView.vue`** – login form with links to `/registrieren` and
-  `/passwort-zuruecksetzen`.
+- **`views/LoginView.vue`** – login form with links to `/register` and
+  `/reset-password`.
 - **`views/RegisterView.vue`** – registration with invite code, username and
   password.
 - **`views/ResetPasswordView.vue`** – password reset with reset code and new
@@ -40,8 +40,8 @@ on port 3000 (`npm run dev --workspace=backend`).
 - **`views/OverviewView.vue`** – loads bookings server-side (search, sort,
   paging), renders `BookingTable` and the "New entry" button, controls the
   delete confirmation dialog.
-- **`views/EntryFormView.vue`** – used for both `/eingabe` (create) and
-  `/eingabe/:id` (edit); in the edit case it loads the existing entry and
+- **`views/EntryFormView.vue`** – used for both `/entry` (create) and
+  `/entry/:id` (edit); in the edit case it loads the existing entry and
   renders `BookingForm`.
 - **`components/AppHeader.vue`** – logo top left, visible only on desktop
   (`hidden md:flex`).

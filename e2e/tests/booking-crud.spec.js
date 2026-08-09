@@ -50,7 +50,7 @@ test('Login, create an entry, confirm it in the overview, find it via search, ed
 
   // Create an entry using only the required field (event name).
   await page.getByRole('link', { name: 'New entry' }).click();
-  await page.waitForURL((url) => url.pathname === '/eingabe');
+  await page.waitForURL((url) => url.pathname === '/entry');
   await page.getByLabel('Event name').fill(eventName);
   await page
     .getByRole('button', { name: 'Add and back to overview' })
@@ -70,7 +70,7 @@ test('Login, create an entry, confirm it in the overview, find it via search, ed
 
   // Edit it.
   await row.getByRole('button', { name: 'Edit' }).click();
-  await page.waitForURL((url) => /^\/eingabe\/.+/.test(url.pathname));
+  await page.waitForURL((url) => /^\/entry\/.+/.test(url.pathname));
   await expect(page.getByLabel('Event name')).toHaveValue(eventName);
   await page.getByLabel('Event name').fill(updatedEventName);
   await page

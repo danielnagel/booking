@@ -22,9 +22,9 @@ function createTestRouter(initialPath = '/login') {
     routes: [
       { path: '/login', name: 'login', component: LoginView },
       { path: '/', name: 'overview', component: { template: '<div>Übersicht</div>' } },
-      { path: '/eingabe', name: 'entry-create', component: { template: '<div>Eingabe</div>' } },
-      { path: '/registrieren', name: 'register', component: { template: '<div />' } },
-      { path: '/passwort-zuruecksetzen', name: 'reset-password', component: { template: '<div />' } },
+      { path: '/entry', name: 'entry-create', component: { template: '<div>Eingabe</div>' } },
+      { path: '/register', name: 'register', component: { template: '<div />' } },
+      { path: '/reset-password', name: 'reset-password', component: { template: '<div />' } },
     ],
   });
   router.push(initialPath);
@@ -55,7 +55,7 @@ describe('LoginView', () => {
 
   it('redirects to the originally requested route after login', async () => {
     apiClient.post.mockResolvedValueOnce({ user: { id: '1', username: 'anna' } });
-    const router = createTestRouter('/login?redirect=%2Feingabe');
+    const router = createTestRouter('/login?redirect=%2Fentry');
     await router.isReady();
 
     render(LoginView, { global: { plugins: [router] } });
@@ -64,7 +64,7 @@ describe('LoginView', () => {
     await fireEvent.update(screen.getByLabelText(/^Password/), 'secret');
     await fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
 
-    await waitFor(() => expect(router.currentRoute.value.path).toBe('/eingabe'));
+    await waitFor(() => expect(router.currentRoute.value.path).toBe('/entry'));
   });
 
   it('shows an error message and stays on the page when login fails', async () => {
@@ -88,7 +88,7 @@ describe('LoginView', () => {
 
     render(LoginView, { global: { plugins: [router] } });
 
-    expect(screen.getByRole('link', { name: /Register/ })).toHaveAttribute('href', '/registrieren');
-    expect(screen.getByRole('link', { name: /Forgot your password/ })).toHaveAttribute('href', '/passwort-zuruecksetzen');
+    expect(screen.getByRole('link', { name: /Register/ })).toHaveAttribute('href', '/register');
+    expect(screen.getByRole('link', { name: /Forgot your password/ })).toHaveAttribute('href', '/reset-password');
   });
 });

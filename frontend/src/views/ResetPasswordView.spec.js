@@ -20,11 +20,11 @@ function createTestRouter() {
   const router = createRouter({
     history: createMemoryHistory(),
     routes: [
-      { path: '/passwort-zuruecksetzen', name: 'reset-password', component: ResetPasswordView },
+      { path: '/reset-password', name: 'reset-password', component: ResetPasswordView },
       { path: '/login', name: 'login', component: { template: '<div>Login</div>' } },
     ],
   });
-  router.push('/passwort-zuruecksetzen');
+  router.push('/reset-password');
   return router;
 }
 
@@ -68,7 +68,7 @@ describe('ResetPasswordView', () => {
     expect(
       await screen.findByText('Reset code is invalid, expired, or already used.'),
     ).toBeInTheDocument();
-    expect(router.currentRoute.value.path).toBe('/passwort-zuruecksetzen');
+    expect(router.currentRoute.value.path).toBe('/reset-password');
   });
 
   it('links back to the login page', async () => {

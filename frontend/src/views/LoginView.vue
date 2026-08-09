@@ -86,6 +86,7 @@ async function handleSubmit() {
         {{ t('login.noAccount') }}
       </router-link>
       <router-link
+        v-if="!demoMode"
         to="/reset-password"
         class="underline"
       >

@@ -61,6 +61,10 @@ router.post('/register', authRateLimiter, async (req, res) => {
 });
 
 router.post('/reset-password', authRateLimiter, async (req, res) => {
+  if (process.env.MODE === 'demo') {
+    return res.status(403).json({ error: 'demo_mode_disabled' });
+  }
+
   const { resetCode, newPassword } = req.body ?? {};
 
   if (!resetCode || !newPassword) {

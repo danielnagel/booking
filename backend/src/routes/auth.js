@@ -17,6 +17,10 @@ const DUMMY_PASSWORD_HASH = await bcrypt.hash(
 );
 
 router.post('/register', authRateLimiter, async (req, res) => {
+  if (process.env.MODE === 'demo') {
+    return res.status(403).json({ error: 'demo_mode_disabled' });
+  }
+
   const { inviteCode, username, password } = req.body ?? {};
 
   if (!inviteCode || !username || !password) {

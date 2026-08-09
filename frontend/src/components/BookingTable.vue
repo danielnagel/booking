@@ -11,6 +11,7 @@ import {
 } from '@tanstack/vue-table';
 
 import { useStatusLabel } from '../constants/bookingStatus';
+import { isDemoMode } from '../constants/mode';
 import TextPreviewDialog from './TextPreviewDialog.vue';
 
 const props = defineProps({
@@ -27,6 +28,7 @@ const emit = defineEmits(['search-change', 'sort-change', 'page-change', 'edit',
 
 const { t, locale } = useI18n();
 const statusLabel = useStatusLabel();
+const demoMode = isDemoMode();
 
 const intlLocale = computed(() => (locale.value === 'de' ? 'de-DE' : 'en-GB'));
 
@@ -169,7 +171,9 @@ const columns = [
           'button',
           {
             type: 'button',
-            class: 'underline text-sm',
+            class: 'underline text-sm disabled:opacity-40 disabled:cursor-not-allowed',
+            disabled: demoMode,
+            title: demoMode ? t('demo.disabled') : undefined,
             onClick: () => emit('edit', info.row.original.id),
           },
           t('bookingTable.edit'),
@@ -178,7 +182,9 @@ const columns = [
           'button',
           {
             type: 'button',
-            class: 'underline text-sm text-red-600',
+            class: 'underline text-sm text-red-600 disabled:opacity-40 disabled:cursor-not-allowed',
+            disabled: demoMode,
+            title: demoMode ? t('demo.disabled') : undefined,
             onClick: () => emit('delete', info.row.original.id),
           },
           t('bookingTable.delete'),

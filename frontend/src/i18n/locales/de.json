@@ -26,6 +26,9 @@
     "submit": "Passwort zurücksetzen",
     "backToLogin": "Zurück zum Login"
   },
+  "demo": {
+    "disabled": "Ist im Demo-Modus deaktiviert"
+  },
   "overview": {
     "title": "Übersicht",
     "newEntry": "Neuer Eintrag",
@@ -126,6 +129,7 @@
     "booking_not_found": "Eintrag nicht gefunden.",
     "event_name_required": "Veranstaltungsname ist erforderlich.",
     "invalid_status": "Ungültiger Status.",
+    "demo_mode_disabled": "Diese Aktion ist im Demo-System nicht möglich.",
     "unknown_error": "Ein unbekannter Fehler ist aufgetreten."
   }
 }

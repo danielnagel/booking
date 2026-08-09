@@ -175,6 +175,10 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
+  if (process.env.MODE === 'demo') {
+    return res.status(403).json({ error: 'demo_mode_disabled' });
+  }
+
   const { event_name: eventName } = req.body ?? {};
 
   if (!eventName || !String(eventName).trim()) {
@@ -207,6 +211,10 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
+  if (process.env.MODE === 'demo') {
+    return res.status(403).json({ error: 'demo_mode_disabled' });
+  }
+
   const { id } = req.params;
   const { event_name: eventName } = req.body ?? {};
 
@@ -245,6 +253,10 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
+  if (process.env.MODE === 'demo') {
+    return res.status(403).json({ error: 'demo_mode_disabled' });
+  }
+
   const { id } = req.params;
 
   const { rowCount } = await pool.query('DELETE FROM bookings WHERE id = $1', [id]);

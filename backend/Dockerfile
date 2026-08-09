@@ -35,5 +35,9 @@ WORKDIR /app/backend
 
 EXPOSE 3000
 
-# Run pending migrations, then start the Express app.
-CMD ["sh", "-c", "npm run migrate && npm start"]
+# Run pending migrations, then start the Express app. When MODE=demo, also
+# seed the demo:demo user and 20 fictional bookings (see
+# backend/src/cli/seedDemo.js) before starting - the demo system has no
+# self-registration (see routes/auth.js), so this is the only way it gets a
+# usable account and example data.
+CMD ["sh", "-c", "npm run migrate && if [ \"$MODE\" = demo ]; then npm run seed:demo; fi && npm start"]

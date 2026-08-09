@@ -27,7 +27,8 @@ FROM nginx:alpine
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/frontend/dist /usr/share/nginx/html
 COPY frontend/docker-entrypoint.d/40-locale-config.sh /docker-entrypoint.d/40-locale-config.sh
-RUN chmod +x /docker-entrypoint.d/40-locale-config.sh
+COPY frontend/docker-entrypoint.d/41-mode-config.sh /docker-entrypoint.d/41-mode-config.sh
+RUN chmod +x /docker-entrypoint.d/40-locale-config.sh /docker-entrypoint.d/41-mode-config.sh
 
 EXPOSE 80
 

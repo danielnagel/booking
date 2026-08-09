@@ -26,6 +26,9 @@
     "submit": "Reset password",
     "backToLogin": "Back to login"
   },
+  "demo": {
+    "disabled": "Disabled in demo mode"
+  },
   "overview": {
     "title": "Overview",
     "newEntry": "New entry",
@@ -126,6 +129,7 @@
     "booking_not_found": "Entry not found.",
     "event_name_required": "Event name is required.",
     "invalid_status": "Invalid status.",
+    "demo_mode_disabled": "This action is not available in the demo system.",
     "unknown_error": "An unknown error occurred."
   }
 }

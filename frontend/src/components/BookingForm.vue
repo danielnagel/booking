@@ -1,9 +1,10 @@
 <script setup>
-import { reactive, watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { apiClient } from '../api/client';
 import { useStatusOptions } from '../constants/bookingStatus';
+import { isDemoMode } from '../constants/mode';
 import FormField from './FormField.vue';
 
 const props = defineProps({
@@ -15,6 +16,10 @@ const emit = defineEmits(['submit']);
 
 const { t } = useI18n();
 const statusOptions = useStatusOptions();
+const demoMode = isDemoMode();
+// The demo system is read-only - the backend rejects all writes to
+// /api/bookings the same way (see backend/src/routes/bookings.js).
+const addDisabled = computed(() => demoMode);
 
 function emptyForm() {
   return {
@@ -83,6 +88,7 @@ function resetForm() {
 defineExpose({ resetForm });
 
 function handleSubmit(andContinue) {
+  if (addDisabled.value) return;
   emit('submit', { data: { ...form }, andContinue });
 }
 </script>
@@ -199,20 +205,26 @@ function handleSubmit(andContinue) {
     />
 
     <div class="flex flex-col sm:flex-row gap-3 mt-4">
-      <button
-        type="button"
-        class="bg-primary text-secondary rounded px-4 py-2"
-        @click="handleSubmit(true)"
-      >
-        {{ isEditMode ? t('bookingForm.saveAndNext') : t('bookingForm.addAndNext') }}
-      </button>
-      <button
-        type="button"
-        class="bg-accent text-secondary rounded px-4 py-2"
-        @click="handleSubmit(false)"
-      >
-        {{ isEditMode ? t('bookingForm.saveAndBack') : t('bookingForm.addAndBack') }}
-      </button>
+      <span :title="addDisabled ? t('demo.disabled') : undefined">
+        <button
+          type="button"
+          class="bg-primary text-secondary rounded px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="addDisabled"
+          @click="handleSubmit(true)"
+        >
+          {{ isEditMode ? t('bookingForm.saveAndNext') : t('bookingForm.addAndNext') }}
+        </button>
+      </span>
+      <span :title="addDisabled ? t('demo.disabled') : undefined">
+        <button
+          type="button"
+          class="bg-accent text-secondary rounded px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="addDisabled"
+          @click="handleSubmit(false)"
+        >
+          {{ isEditMode ? t('bookingForm.saveAndBack') : t('bookingForm.addAndBack') }}
+        </button>
+      </span>
     </div>
   </form>
 </template>

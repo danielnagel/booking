@@ -4,12 +4,14 @@ import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 
 import { useAuthStore } from '../stores/auth';
+import { isDemoMode } from '../constants/mode';
 import FormField from '../components/FormField.vue';
 
 const { t } = useI18n();
 const authStore = useAuthStore();
 const router = useRouter();
 const route = useRoute();
+const demoMode = isDemoMode();
 
 const form = reactive({
   username: '',
@@ -77,6 +79,7 @@ async function handleSubmit() {
 
     <div class="mt-6 flex flex-col items-center gap-2 text-sm">
       <router-link
+        v-if="!demoMode"
         to="/registrieren"
         class="underline"
       >

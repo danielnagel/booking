@@ -57,6 +57,11 @@ services:
       # whatever reverse proxy sits in front of it in a real deployment), so
       # login over http://localhost would silently break if this were
       # "production".
+      # Set MODE=demo (e.g. "MODE=demo docker compose up --build") to try out
+      # the demo-mode restrictions locally: no self-registration, seeded
+      # demo:demo user, 20 example bookings, no new bookings can be created
+      # (see routes/auth.js, routes/bookings.js, src/cli/seedDemo.js).
+      MODE: ${MODE:-}
     depends_on:
       db:
         condition: service_healthy
@@ -74,6 +79,9 @@ services:
       # by frontend/docker-entrypoint.d/40-locale-config.sh, since this is a
       # prebuilt static SPA and can't read process.env at runtime otherwise.
       DEFAULT_LOCALE: ${DEFAULT_LOCALE:-en}
+      # See the "backend" service above - applied at container start by
+      # frontend/docker-entrypoint.d/41-mode-config.sh.
+      MODE: ${MODE:-}
     depends_on:
       - backend
     ports:

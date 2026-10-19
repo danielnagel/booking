@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -23,7 +23,7 @@ services:
   # a plain `docker compose up`. No named volume: test data is disposable and
   # is gone once the container is removed.
   db-test:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     profiles: ["test"]
     environment:
       POSTGRES_USER: ${TEST_POSTGRES_USER:-booking_test}

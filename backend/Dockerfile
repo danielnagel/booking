@@ -1,7 +1,7 @@
 # Build context is the repository root (npm workspaces), see the
 # `build.context`/`build.dockerfile` settings in the root docker-compose.yml.
 
-FROM node:22-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 

@@ -3,11 +3,15 @@ import { computed, h, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import {
   FlexRender,
+  columnGroupingFeature,
+  columnVisibilityFeature,
   createColumnHelper,
-  getCoreRowModel,
-  getExpandedRowModel,
-  getGroupedRowModel,
-  useVueTable,
+  createExpandedRowModel,
+  createGroupedRowModel,
+  rowExpandingFeature,
+  rowSortingFeature,
+  tableFeatures,
+  useTable,
 } from '@tanstack/vue-table';
 
 import { useStatusLabel } from '../constants/bookingStatus';
@@ -71,6 +75,15 @@ function truncatedCell(labelKey) {
     );
   };
 }
+
+const features = tableFeatures({
+  rowSortingFeature,
+  columnGroupingFeature,
+  rowExpandingFeature,
+  columnVisibilityFeature,
+  groupedRowModel: createGroupedRowModel(),
+  expandedRowModel: createExpandedRowModel(),
+});
 
 const columnHelper = createColumnHelper();
 
@@ -210,7 +223,8 @@ watch(localSearch, (value) => {
   searchDebounceHandle = setTimeout(() => emit('search-change', value), 300);
 });
 
-const table = useVueTable({
+const table = useTable({
+  features,
   get data() {
     return props.rows;
   },
@@ -231,11 +245,6 @@ const table = useVueTable({
   },
   enableMultiSort: false,
   manualSorting: true,
-  manualPagination: true,
-  manualFiltering: true,
-  getCoreRowModel: getCoreRowModel(),
-  getGroupedRowModel: getGroupedRowModel(),
-  getExpandedRowModel: getExpandedRowModel(),
 });
 
 function toggleSort(column) {
@@ -333,7 +342,7 @@ function goToPage(page) {
                 ({{ row.subRows.length }})
               </button>
               <FlexRender
-                v-else-if="!cell.getIsPlaceholder() && !cell.getIsAggregated()"
+                v-else-if="!cell.getIsPlaceholder() && !row.getIsGrouped()"
                 :render="cell.column.columnDef.cell"
                 :props="cell.getContext()"
               />
